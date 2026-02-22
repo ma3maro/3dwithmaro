@@ -634,30 +634,6 @@
             const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             const videoExts = ['mp4', 'webm', 'mov'];
 
-            // Check if this slot has a Giphy URL
-            if (giphyUrls[slot]) {
-                const img = new Image();
-                img.onload = () => {
-                    const media = document.createElement('img');
-                    media.src = img.src;
-                    media.className = "max-w-full max-h-full object-contain md:rounded-[1.5rem]";
-                    container.appendChild(media);
-                    lightboxInner.appendChild(container);
-                };
-                img.onerror = () => {
-                    // Fallback to local art folder if Giphy fails
-                    tryImage(0);
-                };
-                img.src = giphyUrls[slot];
-                
-                lightbox.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                if(window.matchMedia("(pointer: fine)").matches) {
-                    document.getElementById('cursor').style.display = 'none';
-                }
-                return;
-            }
-
             const tryImage = (extIndex) => {
                 if (extIndex >= imageExts.length) { tryVideo(0); return; }
                 const img = new Image();
@@ -713,22 +689,6 @@
         lightbox.onclick = (e) => { if(e.target === lightbox) closeLightbox(); };
         document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLightbox(); });
 
-        // ========== GIPHY URLS FOR SLOTS 11-22 ==========
-        const giphyUrls = {
-            11: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZG5ydDQ5YXBqdDF0bzl3bXNheWc1bjltMDBuY3o1aXpveTgwbmNmeiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ychhFoCV7RbIWKwu02/giphy.gif',
-            12: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXd4ZjBhc3kybmRhODdlejRjYnR6bGc0OTU2NzkzNmZwdzN6M3hhZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hNthSMq9ga26YFV4Od/giphy.gif',
-            13: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTg5aGtzemIwdHNhbXlua20wZmFlaXVkNzhtNmRkdmswanJ6cDFzbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/oVhanPSDiEvFVPSHYr/giphy.gif',
-            14: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXBhYmthd3c4eTN1cnN0eGptN3Bta29mNWN5dmExNHE4bTRvMTd2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/w8gEBYtwChVBPi916E/giphy.gif',
-            15: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExamtqMmhmZzdnampuZzJhNjdxdzVoOGk4eXduYngyeTJmcWw2Z2tkbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jQxxRSnBU960rHE4zw/giphy.gif',
-            16: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWk5aHh1dWs4Y2d1ZWVxZG5hYXRpaWk4OGt1MjU4NHJsenM5djVoNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pq7otTAZrh4gfizsf2/giphy.gif',
-            17: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOGphYWhoazZ0Z2hzNmtydzE5cjlqbWwxbDE3ZjZzbTM1bHdkdnQweiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iu23rs5E6Xdd1EQQdl/giphy.gif',
-            18: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWJhdGF0cjcycm9oNTVob3VuMjQ1bXZkbjJ2a2s3eW9sOWo1amN6cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Rm0ZVzJuQ9BVaRWcKz/giphy.gif',
-            19: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Z6enRnNDJoMXN4YWNyZmJnYzZmcmc4d3l2ZmkwbjMyNml4anJrayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/CvQKNT2cHrmG5GwiZO/giphy.gif',
-            20: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmM4OG11aXhuOXNzeWJwdjgzNTlnbmh3MmpweGpzanVkYmQ1dGZraSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KWqqBvgCbz4IYMsYsI/giphy.gif',
-            21: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNnFtcjF3cHRrbHdlNzUxM2tsemp6a2Y0NjBxcm4xNnkwbWlsejZzdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/D0fzTEM8pAMHXBMnzv/giphy.gif',
-            22: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExenV3cmtvMDd0c3YxcGswZXN4YWZ6cmE1MWhsYnZncnQ4NWRocTRpaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6tq7D1U3jQovZPLaAE/giphy.gif'
-        };
-
         // ========== LOAD ART MEDIA INTO GALLERY ==========
         (function loadArtMedia() {
             const workItems = document.querySelectorAll('#works .grid > div');
@@ -751,24 +711,6 @@
                 const loadAndReplace = () => {
                     const mediaContainer = document.createElement('div');
                     mediaContainer.className = 'relative w-full h-full';
-
-                    // Check if this slot has a Giphy URL
-                    if (giphyUrls[slot]) {
-                        const img = new Image();
-                        img.onload = () => {
-                            img.className = 'media-fit';
-                            mediaContainer.appendChild(img);
-                            item.innerHTML = '';
-                            item.appendChild(mediaContainer);
-                            item.classList.remove('shimmer-overlay');
-                        };
-                        img.onerror = () => {
-                            // Fallback to local art folder if Giphy fails
-                            tryImage(0);
-                        };
-                        img.src = giphyUrls[slot];
-                        return;
-                    }
 
                     const tryImageFirst = !isCommercial; 
 
