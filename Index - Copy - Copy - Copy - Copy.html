@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maro Studio | Dominate Markets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070B14;
+            --bg-card: #111726;
+            --accent-teal: #2DD4BF;
+            --accent-orange: #FF6B35;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: #F8FAFC;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        #cursor {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s ease-out;
+        }
+
+        /* Premium Mesh Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(225,39%,20%,0.3) 0, transparent 50%),
+                radial-gradient(at 50% 100%, hsla(170,50%,15%,0.2) 0, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Draggable Carousel */
+        .carousel-container {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            cursor: grab;
+            user-select: none;
+            padding: 2rem 0;
+        }
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+        .carousel-container.active {
+            cursor: grabbing;
+        }
+        .carousel-track {
+            display: flex;
+            gap: 2rem;
+            width: max-content;
+            padding: 0 2rem;
+        }
+
+        /* Commercial items: 9:16 portrait ratio */
+        .commercial-item {
+            width: 300px;
+            height: 533px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #111726 0%, #070B14 100%);
+            border: 1px solid var(--border-subtle);
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+        .commercial-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+
+        /* Placeholder Aesthetics (for works grid) */
+        .placeholder-box {
+            background: linear-gradient(135deg, #111726 0%, #070B14 100%);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+        }
+        .placeholder-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 3s infinite;
+        }
+
+        /* Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glow-card {
+            box-shadow: 0 0 40px rgba(45, 212, 191, 0.1);
+        }
+
+        /* Fullscreen Lightbox Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 11, 20, 0.98);
+            z-index: 10000;
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            cursor: default;
+        }
+        #lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+        .lightbox-content {
+            width: 90%;
+            height: 80%;
+            max-width: 1200px;
+            position: relative;
+            border-radius: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #111726;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+        }
+        
+        /* Media fit */
+        .media-fit {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* slot-number class removed – no longer used */
+    </style>
+</head>
+<body>
+
+    <div id="cursor"></div>
+    <div class="mesh-bg"></div>
+
+    <!-- Lightbox Overlay -->
+    <div id="lightbox" class="items-center justify-center p-8">
+        <button id="close-lightbox" class="fixed top-8 right-8 z-[10001] bg-white/10 hover:bg-white/20 w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md transition-all border border-white/20 group">
+            <svg class="w-6 h-6 text-white group-hover:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <div class="lightbox-content" id="lightbox-inner">
+            <!-- Content injected via JS -->
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-[#070B14]/60 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+            <div class="text-2xl font-extrabold tracking-tighter">MARO<span class="text-teal-400">.</span></div>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
+                <a href="#works" class="hover:text-white transition-colors">Works</a>
+                <a href="#commercials" class="hover:text-white transition-colors">Commercials</a>
+                <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+            </div>
+            <a href="#pricing" class="px-6 py-2 rounded-full bg-white text-black text-sm font-bold hover:scale-105 transition-transform">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-48 pb-24 px-8 max-w-7xl mx-auto">
+        <div class="max-w-4xl">
+            <h1 class="text-7xl md:text-9xl font-black tracking-tighter leading-[0.9] reveal">
+                DOMINATE<br>
+                <span class="text-slate-500">MARKETS</span>
+            </h1>
+            <p class="mt-8 text-xl md:text-2xl text-slate-400 leading-relaxed reveal" style="transition-delay: 200ms;">
+                With visuals that help small and big business to dominate their market with high engagement animations and visuals that instantly hook viewers and increase sales through attraction.
+            </p>
+        </div>
+    </section>
+
+    <!-- Expanded Works Grid -->
+    <section id="works" class="py-24 px-8 max-w-7xl mx-auto">
+        <div class="flex justify-between items-end mb-12 reveal">
+            <h2 class="text-4xl font-bold italic tracking-tight">Works_Archive</h2>
+            <div class="text-slate-500 text-sm font-mono">[ 12 SELECTED PROJECTS ]</div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[280px]">
+            <!-- Row 1 -->
+            <div class="lg:col-span-2 lg:row-span-2 placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
+            <div class="placeholder-box rounded-3xl reveal delay-100 flex items-center justify-center group"></div>
+            <div class="placeholder-box rounded-3xl reveal delay-200 flex items-center justify-center group"></div>
+            <!-- Row 2 -->
+            <div class="placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
+            <div class="placeholder-box rounded-3xl reveal delay-100 flex items-center justify-center group"></div>
+            <!-- Row 3 -->
+            <div class="lg:col-span-2 placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
+            <div class="placeholder-box rounded-3xl reveal delay-200 flex items-center justify-center group"></div>
+            <div class="placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
+            <!-- Row 4 -->
+            <div class="placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
+            <div class="lg:col-span-3 placeholder-box rounded-3xl reveal delay-100 flex items-center justify-center group"></div>
+        </div>
+    </section>
+
+    <!-- Draggable Commercials Carousel (9:16 portrait) -->
+    <section id="commercials" class="py-24 bg-white/5 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-8 mb-12 reveal">
+            <h2 class="text-5xl font-bold tracking-tighter">Animated<br><span class="text-teal-400">Commercials</span></h2>
+        </div>
+
+        <!-- Draggable container -->
+        <div class="carousel-container" id="commercialCarousel">
+            <div class="carousel-track" id="commercialTrack">
+                <!-- Items will be cloned via JS to add more, base items here -->
+                <div class="commercial-item group"></div>
+                <div class="commercial-item group"></div>
+                <div class="commercial-item group"></div>
+                <div class="commercial-item group"></div>
+                <div class="commercial-item group"></div>
+                <div class="commercial-item group"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING SECTION – UPDATED with WhatsApp buttons -->
+    <section id="pricing" class="py-32 px-8 max-w-7xl mx-auto">
+        <div class="text-center mb-20 reveal">
+            <h2 class="text-5xl font-black mb-4">Pricing to meet different needs.</h2>
+            <p class="text-slate-400 text-lg">Choose a plan that scales your brand today.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Foundation -->
+            <div class="bg-[#111726] border border-white/5 p-10 rounded-[2.5rem] flex flex-col reveal">
+                <h3 class="text-2xl font-bold mb-2">Foundation</h3>
+                <div class="flex items-baseline gap-2 mb-2">
+                    <span class="text-4xl font-extrabold">$999</span>
+                    <span class="text-slate-500 line-through font-medium">$1,999</span>
+                </div>
+                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">50% Discount Applied</p>
+
+                <ul class="space-y-6 mb-12 flex-grow">
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        1 animated product video (showing all product features)
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        1 hero shot for landing pages and social media
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        1 master shot covering different/all variations of your product
+                    </li>
+                </ul>
+                <button onclick="sendWhatsApp('Foundation')" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-colors">Select Plan</button>
+            </div>
+
+            <!-- Outstander (Featured) -->
+            <div class="bg-[#111726] border-2 border-teal-500/50 p-10 rounded-[2.5rem] flex flex-col relative reveal glow-card md:-translate-y-6">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">Most Recommended</div>
+                
+                <h3 class="text-2xl font-bold mb-2">Outstander</h3>
+                <div class="flex items-baseline gap-2 mb-2">
+                    <span class="text-4xl font-extrabold">$2,499</span>
+                    <span class="text-slate-500 line-through font-medium">$4,999</span>
+                </div>
+                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">50% Discount Applied</p>
+
+                <ul class="space-y-6 mb-12 flex-grow">
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        3 high-quality videos (with clear storyboards and reference)
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        2 premium hero shots (ads + landing page)
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Studio/white background shots for online store
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Private WhatsApp group with daily updates
+                    </li>
+                </ul>
+                <button onclick="sendWhatsApp('Outstander')" class="w-full py-4 rounded-2xl bg-teal-500 text-black font-extrabold hover:scale-[1.02] transition-transform">Get Started Today</button>
+            </div>
+
+            <!-- Market Dominator -->
+            <div class="bg-[#111726] border border-white/5 p-10 rounded-[2.5rem] flex flex-col reveal delay-200">
+                <h3 class="text-2xl font-bold mb-2">Market Dominator</h3>
+                <div class="flex items-baseline gap-2 mb-2">
+                    <span class="text-4xl font-extrabold">$4,999</span>
+                    <span class="text-slate-500 line-through font-medium">$9,999</span>
+                </div>
+                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">50% Discount Applied</p>
+
+                <ul class="space-y-6 mb-12 flex-grow">
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        6 high-impact videos (Advanced motion graphics)
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        3 premium hero shots
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Monthly performance reviews (charts + strategy)
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Consistent weekly + monthly social uploads
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-300">
+                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Private WhatsApp group for tracking
+                    </li>
+                </ul>
+                <button onclick="sendWhatsApp('Market Dominator')" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-colors">Select Plan</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer with Instagram only -->
+    <footer class="py-12 border-t border-white/5 px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-xl font-bold tracking-tighter text-slate-500">MARO STUDIO<span class="text-teal-400/50">.</span></div>
+            <p class="text-slate-500 text-sm">© 2026 Maro Studio. All rights reserved.</p>
+            <!-- Single Instagram link, other social removed -->
+            <a href="https://www.instagram.com/3dwith_maro" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors group">
+                <svg class="w-5 h-5 text-slate-400 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.309.975.975 1.247 2.242 1.309 3.608.058 1.266.07 1.646.07 4.85 0 3.204-.012 3.584-.07 4.849-.062 1.366-.334 2.633-1.309 3.608-.975.975-2.242 1.247-3.608 1.309-1.266.058-1.646.07-4.85.07-3.204 0-3.584-.012-4.85-.07-1.366-.062-2.633-.334-3.608-1.309-.975-.975-1.247-2.242-1.309-3.608-.058-1.265-.07-1.645-.07-4.849 0-3.204.012-3.584.07-4.85.062-1.366.334-2.633 1.309-3.608.975-.975 2.242-1.247 3.608-1.309 1.265-.058 1.645-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.558.07-2.975.457-4.064 1.546-1.089 1.089-1.476 2.506-1.546 4.064-.058 1.28-.072 1.688-.072 4.947 0 3.259.014 3.667.072 4.947.07 1.558.457 2.975 1.546 4.064 1.089 1.089 2.506 1.476 4.064 1.546 1.28.058 1.688.072 4.947.072 3.259 0 3.667-.014 4.947-.072 1.558-.07 2.975-.457 4.064-1.546 1.089-1.089 1.476-2.506 1.546-4.064.058-1.28.072-1.688.072-4.947 0-3.259-.014-3.667-.072-4.947-.07-1.558-.457-2.975-1.546-4.064-1.089-1.089-2.506-1.476-4.064-1.546-1.28-.058-1.688-.072-4.947-.072z"></path>
+                    <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998z"></path>
+                    <circle cx="18.406" cy="5.594" r="1.44"></circle>
+                </svg>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // ========== CUSTOM CURSOR ==========
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.querySelectorAll('a, button, .placeholder-box, .commercial-item').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.style.transform = 'scale(4)');
+            el.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+        });
+
+        // ========== REVEAL ANIMATIONS ==========
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, observerOptions);
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ========== DRAGGABLE CAROUSEL (commercials) ==========
+        const carousel = document.getElementById('commercialCarousel');
+        const track = document.getElementById('commercialTrack');
+
+        // Clone items to have more content (like original duplication but without animation)
+        const originalItems = Array.from(track.children);
+        originalItems.forEach(item => {
+            const clone = item.cloneNode(true);
+            track.appendChild(clone);
+        });
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        carousel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            carousel.classList.add('active');
+            startX = e.pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+            e.preventDefault();
+        });
+
+        carousel.addEventListener('mouseleave', () => {
+            isDown = false;
+            carousel.classList.remove('active');
+        });
+
+        carousel.addEventListener('mouseup', () => {
+            isDown = false;
+            carousel.classList.remove('active');
+        });
+
+        carousel.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 1.5;
+            carousel.scrollLeft = scrollLeft - walk;
+        });
+
+        // Touch events for mobile
+        carousel.addEventListener('touchstart', (e) => {
+            isDown = true;
+            carousel.classList.add('active');
+            startX = e.touches[0].pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+        });
+
+        carousel.addEventListener('touchend', () => {
+            isDown = false;
+            carousel.classList.remove('active');
+        });
+
+        carousel.addEventListener('touchmove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.touches[0].pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 1.5;
+            carousel.scrollLeft = scrollLeft - walk;
+        });
+
+        // ========== LIGHTBOX LOGIC (cleaned, no slot numbers) ==========
+        const lightbox = document.getElementById('lightbox');
+        const lightboxInner = document.getElementById('lightbox-inner');
+        const closeBtn = document.getElementById('close-lightbox');
+
+        window.openLightboxBySlot = function(slot) {
+            lightboxInner.innerHTML = ''; 
+            const container = document.createElement('div');
+            container.className = "w-full h-full flex items-center justify-center bg-black/40";
+
+            const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            const videoExts = ['mp4', 'webm', 'mov'];
+
+            const tryImage = (extIndex) => {
+                if (extIndex >= imageExts.length) { tryVideo(0); return; }
+                const img = new Image();
+                img.onload = () => {
+                    const media = document.createElement('img');
+                    media.src = img.src;
+                    media.className = "max-w-full max-h-full object-contain";
+                    container.appendChild(media);
+                    lightboxInner.appendChild(container);
+                };
+                img.onerror = () => tryImage(extIndex + 1);
+                img.src = `art/${slot}.${imageExts[extIndex]}`;
+            };
+
+            const tryVideo = (extIndex) => {
+                if (extIndex >= videoExts.length) {
+                    // Generic placeholder without slot number
+                    container.innerHTML = `<div class="text-center p-12"><div class="w-24 h-24 mx-auto mb-6 text-teal-400/20"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div><h2 class="text-2xl font-bold mb-2">Preview unavailable</h2><p class="text-slate-400"></p></div>`;
+                    lightboxInner.appendChild(container);
+                    return;
+                }
+                const video = document.createElement('video');
+                video.oncanplay = () => {
+                    video.className = "max-w-full max-h-full object-contain";
+                    video.controls = true;
+                    video.autoplay = true;
+                    container.appendChild(video);
+                    lightboxInner.appendChild(container);
+                };
+                video.onerror = () => tryVideo(extIndex + 1);
+                video.src = `art/${slot}.${videoExts[extIndex]}`;
+            };
+
+            tryImage(0);
+
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            cursor.style.display = 'none';
+        };
+
+        const closeLightbox = () => {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            cursor.style.display = 'block';
+            lightboxInner.innerHTML = '';
+        };
+
+        closeBtn.onclick = closeLightbox;
+        lightbox.onclick = (e) => { if(e.target === lightbox) closeLightbox(); };
+        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLightbox(); });
+
+        // ========== LOAD ART MEDIA INTO ALL GALLERY ITEMS – NO SLOT NUMBERS ==========
+        (function loadArtMedia() {
+            const workItems = document.querySelectorAll('#works .grid > div');
+            const commercialItems = document.querySelectorAll('#commercials .commercial-item');
+            const allItems = [...workItems, ...commercialItems];
+
+            allItems.forEach((item, index) => {
+                const slot = index + 1;
+                item.dataset.slot = slot;
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    openLightboxBySlot(slot);
+                };
+
+                const isCommercial = [...commercialItems].includes(item);
+                const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                const videoExts = ['mp4', 'webm', 'mov'];
+
+                const loadAndReplace = () => {
+                    const mediaContainer = document.createElement('div');
+                    mediaContainer.className = 'relative w-full h-full';
+                    // NO slot-number badge added
+
+                    const tryImageFirst = !isCommercial; // works: images first; commercials: videos first
+
+                    const tryImage = (extIndex) => {
+                        if (extIndex >= imageExts.length) {
+                            if (tryImageFirst) tryVideo(0);
+                            else showPlaceholder();
+                            return;
+                        }
+                        const img = new Image();
+                        img.onload = () => {
+                            img.className = 'media-fit';
+                            mediaContainer.appendChild(img);
+                            item.innerHTML = '';
+                            item.appendChild(mediaContainer);
+                        };
+                        img.onerror = () => tryImage(extIndex + 1);
+                        img.src = `art/${slot}.${imageExts[extIndex]}`;
+                    };
+
+                    const tryVideo = (extIndex) => {
+                        if (extIndex >= videoExts.length) {
+                            if (!tryImageFirst) tryImage(0);
+                            else showPlaceholder();
+                            return;
+                        }
+                        const video = document.createElement('video');
+                        video.oncanplay = () => {
+                            video.className = 'media-fit';
+                            video.muted = true;
+                            video.loop = true;
+                            video.autoplay = true;
+                            video.playsInline = true;
+                            video.load();
+                            mediaContainer.appendChild(video);
+                            item.innerHTML = '';
+                            item.appendChild(mediaContainer);
+                        };
+                        video.onerror = () => tryVideo(extIndex + 1);
+                        video.src = `art/${slot}.${videoExts[extIndex]}`;
+                    };
+
+                    const showPlaceholder = () => {
+                        // keep original look, absolutely no number
+                        // item.innerHTML unchanged (already has placeholder styling)
+                        // just ensure no extra badges
+                    };
+
+                    if (tryImageFirst) tryImage(0);
+                    else tryVideo(0);
+                };
+
+                loadAndReplace();
+            });
+        })();
+
+        // ========== WHATSAPP MESSAGING FUNCTION ==========
+        window.sendWhatsApp = function(planName) {
+            const phone = "201035342430"; // without '+'
+            const message = `Select ${planName}`;
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        };
+    </script>
+</body>
+</html>
