@@ -760,12 +760,10 @@
             });
         })();
 
-        // ========== WHATSAPP MESSAGING FUNCTION ==========
+        // ========== CALENDLY BOOKING FUNCTION ==========
         window.sendWhatsApp = function(planName) {
-            const phone = "201035342430";
-            const message = `Select ${planName}`;
-            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+            const calendlyUrl = "https://calendly.com/3dwithmaro/outstander";
+            window.open(calendlyUrl, '_blank');
         };
     </script>
 </body>
