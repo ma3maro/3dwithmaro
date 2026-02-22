@@ -1,39 +1,97 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth antialiased">
+<html lang="en" class="scroll-smooth antialiased selection:bg-teal-500/30 selection:text-teal-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maro Studio | Dominate Markets</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#030508',
+                        card: '#0A0E17',
+                        teal: { 400: '#2DD4BF', 500: '#14B8A6' },
+                        orange: { 500: '#FF6B35' }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                        'glass-border': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%)',
+                    },
+                    animation: {
+                        'shimmer': 'shimmer 3s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        shimmer: {
+                            '0%': { transform: 'translateX(-150%) skewX(-15deg)' },
+                            '100%': { transform: 'translateX(150%) skewX(-15deg)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(45, 212, 191, 0.4)' },
+                            '50%': { opacity: .7, boxShadow: '0 0 10px rgba(45, 212, 191, 0.1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         :root {
-            --bg-dark: #070B14;
-            --bg-card: #111726;
             --accent-teal: #2DD4BF;
-            --accent-orange: #FF6B35;
-            --border-subtle: rgba(255, 255, 255, 0.08);
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
+            background-color: #030508;
             color: #F8FAFC;
             overflow-x: hidden;
-            cursor: none;
+            cursor: none; /* Custom cursor */
         }
 
-        /* Custom Cursor */
+        /* Hardware-accelerated Smooth Cursor */
         #cursor {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             position: fixed;
+            top: 0;
+            left: 0;
+            margin-left: -8px;
+            margin-top: -8px;
             pointer-events: none;
             z-index: 9999;
             mix-blend-mode: difference;
-            transition: transform 0.15s ease-out;
+            will-change: transform;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+        }
+        #cursor.hover-state {
+            width: 60px;
+            height: 60px;
+            margin-left: -30px;
+            margin-top: -30px;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        /* Studio Noise Overlay */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         /* Premium Mesh Background */
@@ -41,88 +99,109 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(225,39%,20%,0.3) 0, transparent 50%),
-                radial-gradient(at 50% 100%, hsla(170,50%,15%,0.2) 0, transparent 50%);
+                radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.08) 0%, transparent 40%), 
+                radial-gradient(circle at 85% 30%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 100%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
             z-index: -1;
+            filter: blur(40px);
         }
 
-        /* Draggable Carousel */
+        /* Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Carousel Edge Fading & Draggable Styling */
+        .carousel-wrapper {
+            position: relative;
+        }
+        .carousel-wrapper::before,
+        .carousel-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 100px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .carousel-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, #030508, transparent);
+        }
+        .carousel-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, #030508, transparent);
+        }
+        
         .carousel-container {
             overflow-x: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
             cursor: grab;
             user-select: none;
-            padding: 2rem 0;
+            padding: 3rem 0;
         }
-        .carousel-container::-webkit-scrollbar {
-            display: none;
-        }
-        .carousel-container.active {
-            cursor: grabbing;
-        }
+        .carousel-container::-webkit-scrollbar { display: none; }
+        .carousel-container.active { cursor: grabbing; }
         .carousel-track {
             display: flex;
             gap: 2rem;
             width: max-content;
-            padding: 0 2rem;
+            padding: 0 4rem;
         }
 
-        /* Commercial items: 9:16 portrait ratio */
+        /* Premium Item Cards */
+        .commercial-item, .placeholder-box {
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+        }
+        .commercial-item:hover, .placeholder-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(45, 212, 191, 0.15), inset 0 1px 1px rgba(255,255,255,0.1);
+        }
+        
         .commercial-item {
             width: 300px;
             height: 533px;
             flex-shrink: 0;
-            background: linear-gradient(135deg, #111726 0%, #070B14 100%);
-            border: 1px solid var(--border-subtle);
-            border-radius: 1rem;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
         }
-        .commercial-item::after {
+
+        /* Shimmer Overlay */
+        .shimmer-overlay::after {
             content: '';
             position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            transform: translateX(-100%);
+            top: 0; left: -150%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
+            transform: skewX(-15deg);
             animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
+            pointer-events: none;
         }
 
-        /* Placeholder Aesthetics (for works grid) */
-        .placeholder-box {
-            background: linear-gradient(135deg, #111726 0%, #070B14 100%);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border-subtle);
-            cursor: pointer;
-        }
-        .placeholder-box::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            transform: translateX(-100%);
-            animation: shimmer 3s infinite;
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(10, 14, 23, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Reveal Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .glow-card {
-            box-shadow: 0 0 40px rgba(45, 212, 191, 0.1);
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         /* Fullscreen Lightbox Styles */
@@ -130,11 +209,11 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(7, 11, 20, 0.98);
+            background: rgba(3, 5, 8, 0.95);
             z-index: 10000;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(30px);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: default;
         }
         #lightbox.active {
@@ -143,282 +222,286 @@
         }
         .lightbox-content {
             width: 90%;
-            height: 80%;
-            max-width: 1200px;
+            height: 85%;
+            max-width: 1400px;
             position: relative;
             border-radius: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: #111726;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: #0A0E17;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
+            transform: scale(0.95);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #lightbox.active .lightbox-content {
+            transform: scale(1);
         }
         
-        /* Media fit */
         .media-fit {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
         }
-        /* slot-number class removed – no longer used */
+        .commercial-item:hover .media-fit, .placeholder-box:hover .media-fit {
+            transform: scale(1.03);
+        }
     </style>
 </head>
 <body>
 
     <div id="cursor"></div>
+    <div class="noise-overlay"></div>
     <div class="mesh-bg"></div>
 
-    <!-- Lightbox Overlay -->
     <div id="lightbox" class="items-center justify-center p-8">
-        <button id="close-lightbox" class="fixed top-8 right-8 z-[10001] bg-white/10 hover:bg-white/20 w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md transition-all border border-white/20 group">
-            <svg class="w-6 h-6 text-white group-hover:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        <button id="close-lightbox" class="fixed top-8 right-8 z-[10001] bg-white/5 hover:bg-white/10 w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-xl transition-all border border-white/10 group shadow-xl hover:scale-105 interactive">
+            <svg class="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
         <div class="lightbox-content" id="lightbox-inner">
-            <!-- Content injected via JS -->
-        </div>
+            </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 bg-[#070B14]/60 backdrop-blur-xl border-b border-white/5">
-        <div class="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
-            <div class="text-2xl font-extrabold tracking-tighter">MARO<span class="text-teal-400">.</span></div>
-            <div class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
-                <a href="#works" class="hover:text-white transition-colors">Works</a>
-                <a href="#commercials" class="hover:text-white transition-colors">Commercials</a>
-                <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+    <nav class="fixed top-0 w-full z-50 bg-[#030508]/70 backdrop-blur-2xl border-b border-white/[0.03] transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-8 h-24 flex items-center justify-between">
+            <div class="text-2xl font-black tracking-tighter text-white cursor-pointer interactive">MARO<span class="text-teal-400">.</span></div>
+            <div class="hidden md:flex gap-10 text-sm font-semibold text-slate-400 tracking-wide">
+                <a href="#works" class="hover:text-white transition-colors interactive">Works</a>
+                <a href="#commercials" class="hover:text-white transition-colors interactive">Commercials</a>
+                <a href="#pricing" class="hover:text-white transition-colors interactive">Pricing</a>
             </div>
-            <a href="#pricing" class="px-6 py-2 rounded-full bg-white text-black text-sm font-bold hover:scale-105 transition-transform">Get Started</a>
+            <a href="#pricing" class="px-7 py-3 rounded-full bg-white text-dark text-sm font-bold hover:bg-slate-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.15)] interactive">Get Started</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="pt-48 pb-24 px-8 max-w-7xl mx-auto">
-        <div class="max-w-4xl">
-            <h1 class="text-7xl md:text-9xl font-black tracking-tighter leading-[0.9] reveal">
+    <section class="pt-56 pb-32 px-8 max-w-7xl mx-auto min-h-[90vh] flex flex-col justify-center relative">
+        <div class="absolute top-20 left-0 w-64 h-64 bg-teal-500/20 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+        <div class="max-w-5xl">
+            <h1 class="text-[5rem] md:text-[8rem] lg:text-[10rem] font-black tracking-tighter leading-[0.85] reveal text-gradient drop-shadow-2xl">
                 DOMINATE<br>
-                <span class="text-slate-500">MARKETS</span>
+                <span class="text-slate-600/80 bg-clip-text text-transparent bg-gradient-to-b from-slate-500 to-slate-800">MARKETS</span>
             </h1>
-            <p class="mt-8 text-xl md:text-2xl text-slate-400 leading-relaxed reveal" style="transition-delay: 200ms;">
+            <p class="mt-12 text-xl md:text-2xl text-slate-400 leading-relaxed reveal max-w-3xl font-medium" style="transition-delay: 150ms;">
                 With visuals that help small and big business to dominate their market with high engagement animations and visuals that instantly hook viewers and increase sales through attraction.
             </p>
         </div>
     </section>
 
-    <!-- Expanded Works Grid -->
-    <section id="works" class="py-24 px-8 max-w-7xl mx-auto">
-        <div class="flex justify-between items-end mb-12 reveal">
-            <h2 class="text-4xl font-bold italic tracking-tight">Works_Archive</h2>
-            <div class="text-slate-500 text-sm font-mono">[ 12 SELECTED PROJECTS ]</div>
+    <section id="works" class="py-32 px-8 max-w-7xl mx-auto border-t border-white/[0.02]">
+        <div class="flex flex-col md:flex-row justify-between md:items-end mb-16 reveal gap-4">
+            <h2 class="text-5xl font-black tracking-tight text-white">Works_Archive</h2>
+            <div class="text-teal-400/70 text-sm font-mono tracking-widest uppercase bg-teal-500/10 px-4 py-2 rounded-full border border-teal-500/20 backdrop-blur-sm">[ 12 SELECTED PROJECTS ]</div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[280px]">
-            <!-- Row 1 -->
-            <div class="lg:col-span-2 lg:row-span-2 placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
-            <div class="placeholder-box rounded-3xl reveal delay-100 flex items-center justify-center group"></div>
-            <div class="placeholder-box rounded-3xl reveal delay-200 flex items-center justify-center group"></div>
-            <!-- Row 2 -->
-            <div class="placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
-            <div class="placeholder-box rounded-3xl reveal delay-100 flex items-center justify-center group"></div>
-            <!-- Row 3 -->
-            <div class="lg:col-span-2 placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
-            <div class="placeholder-box rounded-3xl reveal delay-200 flex items-center justify-center group"></div>
-            <div class="placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
-            <!-- Row 4 -->
-            <div class="placeholder-box rounded-3xl reveal flex items-center justify-center group"></div>
-            <div class="lg:col-span-3 placeholder-box rounded-3xl reveal delay-100 flex items-center justify-center group"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[320px]">
+            <div class="lg:col-span-2 lg:row-span-2 placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 200ms;"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
+            <div class="lg:col-span-2 placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 200ms;"></div>
+            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
+            <div class="lg:col-span-3 placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
         </div>
     </section>
 
-    <!-- Draggable Commercials Carousel (9:16 portrait) -->
-    <section id="commercials" class="py-24 bg-white/5 border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-8 mb-12 reveal">
-            <h2 class="text-5xl font-bold tracking-tighter">Animated<br><span class="text-teal-400">Commercials</span></h2>
+    <section id="commercials" class="py-32 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-8 mb-16 reveal relative z-10">
+            <h2 class="text-6xl font-black tracking-tighter">Animated<br><span class="text-teal-400">Commercials</span></h2>
         </div>
 
-        <!-- Draggable container -->
-        <div class="carousel-container" id="commercialCarousel">
-            <div class="carousel-track" id="commercialTrack">
-                <!-- Items will be cloned via JS to add more, base items here -->
-                <div class="commercial-item group"></div>
-                <div class="commercial-item group"></div>
-                <div class="commercial-item group"></div>
-                <div class="commercial-item group"></div>
-                <div class="commercial-item group"></div>
-                <div class="commercial-item group"></div>
+        <div class="carousel-wrapper relative z-10">
+            <div class="carousel-container" id="commercialCarousel">
+                <div class="carousel-track" id="commercialTrack">
+                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
+                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
+                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
+                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
+                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
+                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- PRICING SECTION – UPDATED with WhatsApp buttons -->
-    <section id="pricing" class="py-32 px-8 max-w-7xl mx-auto">
-        <div class="text-center mb-20 reveal">
-            <h2 class="text-5xl font-black mb-4">Pricing to meet different needs.</h2>
-            <p class="text-slate-400 text-lg">Choose a plan that scales your brand today.</p>
+    <section id="pricing" class="py-40 px-8 max-w-7xl mx-auto border-t border-white/[0.02] relative">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-full bg-teal-500/5 blur-[150px] -z-10 rounded-full pointer-events-none"></div>
+        
+        <div class="text-center mb-24 reveal">
+            <h2 class="text-5xl md:text-6xl font-black mb-6 tracking-tight">Pricing to meet different needs.</h2>
+            <p class="text-slate-400 text-xl max-w-2xl mx-auto font-medium">Choose a plan that scales your brand today.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Foundation -->
-            <div class="bg-[#111726] border border-white/5 p-10 rounded-[2.5rem] flex flex-col reveal">
-                <h3 class="text-2xl font-bold mb-2">Foundation</h3>
-                <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-4xl font-extrabold">$999</span>
-                    <span class="text-slate-500 line-through font-medium">$1,999</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div class="glass-card p-10 rounded-[2.5rem] flex flex-col reveal interactive transition-transform hover:-translate-y-2">
+                <h3 class="text-2xl font-bold mb-3 text-white">Foundation</h3>
+                <div class="flex items-baseline gap-3 mb-3">
+                    <span class="text-5xl font-black text-white">$999</span>
+                    <span class="text-slate-500 line-through font-semibold text-lg">$1,999</span>
                 </div>
-                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">50% Discount Applied</p>
+                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10 bg-teal-400/10 w-max px-3 py-1 rounded-full">50% Discount Applied</p>
 
                 <ul class="space-y-6 mb-12 flex-grow">
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         1 animated product video (showing all product features)
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         1 hero shot for landing pages and social media
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         1 master shot covering different/all variations of your product
                     </li>
                 </ul>
-                <button onclick="sendWhatsApp('Foundation')" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-colors">Select Plan</button>
+                <button onclick="sendWhatsApp('Foundation')" class="w-full py-5 rounded-2xl bg-white/[0.03] border border-white/10 font-bold text-white hover:bg-white/10 transition-colors">Select Plan</button>
             </div>
 
-            <!-- Outstander (Featured) -->
-            <div class="bg-[#111726] border-2 border-teal-500/50 p-10 rounded-[2.5rem] flex flex-col relative reveal glow-card md:-translate-y-6">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-teal-500 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">Most Recommended</div>
+            <div class="bg-card border border-teal-500/30 p-12 rounded-[2.5rem] flex flex-col relative reveal md:-translate-y-6 shadow-[0_0_40px_rgba(45,212,191,0.1)] interactive z-10 transition-transform hover:-translate-y-8">
+                <div class="absolute inset-0 rounded-[2.5rem] border-2 border-transparent bg-clip-border [background-image:linear-gradient(to_bottom,rgba(45,212,191,0.5),rgba(45,212,191,0.1))] pointer-events-none -z-10"></div>
+                <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-teal-500 text-dark px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg animate-pulse-glow">Most Recommended</div>
                 
-                <h3 class="text-2xl font-bold mb-2">Outstander</h3>
-                <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-4xl font-extrabold">$2,499</span>
-                    <span class="text-slate-500 line-through font-medium">$4,999</span>
+                <h3 class="text-3xl font-black mb-3 text-white">Outstander</h3>
+                <div class="flex items-baseline gap-3 mb-3">
+                    <span class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500">$2,499</span>
+                    <span class="text-slate-500 line-through font-semibold text-xl">$4,999</span>
                 </div>
-                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">50% Discount Applied</p>
+                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10 bg-teal-400/10 w-max px-3 py-1 rounded-full">50% Discount Applied</p>
 
                 <ul class="space-y-6 mb-12 flex-grow">
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-200 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         3 high-quality videos (with clear storyboards and reference)
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-200 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         2 premium hero shots (ads + landing page)
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-200 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Studio/white background shots for online store
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-200 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Private WhatsApp group with daily updates
                     </li>
                 </ul>
-                <button onclick="sendWhatsApp('Outstander')" class="w-full py-4 rounded-2xl bg-teal-500 text-black font-extrabold hover:scale-[1.02] transition-transform">Get Started Today</button>
+                <button onclick="sendWhatsApp('Outstander')" class="w-full py-5 rounded-2xl bg-teal-500 text-dark font-extrabold text-lg shadow-[0_10px_20px_-10px_rgba(45,212,191,0.5)] hover:bg-teal-400 transition-colors">Get Started Today</button>
             </div>
 
-            <!-- Market Dominator -->
-            <div class="bg-[#111726] border border-white/5 p-10 rounded-[2.5rem] flex flex-col reveal delay-200">
-                <h3 class="text-2xl font-bold mb-2">Market Dominator</h3>
-                <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-4xl font-extrabold">$4,999</span>
-                    <span class="text-slate-500 line-through font-medium">$9,999</span>
+            <div class="glass-card p-10 rounded-[2.5rem] flex flex-col reveal interactive transition-transform hover:-translate-y-2" style="transition-delay: 100ms;">
+                <h3 class="text-2xl font-bold mb-3 text-white">Market Dominator</h3>
+                <div class="flex items-baseline gap-3 mb-3">
+                    <span class="text-5xl font-black text-white">$4,999</span>
+                    <span class="text-slate-500 line-through font-semibold text-lg">$9,999</span>
                 </div>
-                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">50% Discount Applied</p>
+                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10 bg-teal-400/10 w-max px-3 py-1 rounded-full">50% Discount Applied</p>
 
                 <ul class="space-y-6 mb-12 flex-grow">
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         6 high-impact videos (Advanced motion graphics)
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         3 premium hero shots
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Monthly performance reviews (charts + strategy)
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Consistent weekly + monthly social uploads
                     </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <li class="flex gap-4 text-sm text-slate-300 font-medium leading-relaxed">
+                        <svg class="w-6 h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Private WhatsApp group for tracking
                     </li>
                 </ul>
-                <button onclick="sendWhatsApp('Market Dominator')" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-colors">Select Plan</button>
+                <button onclick="sendWhatsApp('Market Dominator')" class="w-full py-5 rounded-2xl bg-white/[0.03] border border-white/10 font-bold text-white hover:bg-white/10 transition-colors">Select Plan</button>
             </div>
 
-            <!-- Custom Plan -->
-            <div class="bg-[#111726] border border-white/5 p-10 rounded-[2.5rem] flex flex-col reveal delay-300 lg:col-span-3">
-                <h3 class="text-2xl font-bold mb-2" style="color: #FF6B35;">Enterprise</h3>
-                <div class="flex items-baseline gap-2 mb-2">
-                    <span class="text-4xl font-extrabold">Custom Plan</span>
-                </div>
-                <p class="text-xs text-teal-400 font-bold uppercase tracking-widest mb-10">Tailored Strategy</p>
+            <div class="glass-card p-10 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-10 reveal lg:col-span-3 mt-4 border-orange-500/20 shadow-[0_0_30px_rgba(255,107,53,0.05)] interactive transition-transform hover:-translate-y-1">
+                <div class="flex-1">
+                    <h3 class="text-3xl font-black mb-3 text-orange-500 tracking-tight">Enterprise</h3>
+                    <div class="flex items-baseline gap-2 mb-4">
+                        <span class="text-4xl font-extrabold text-white">Custom Plan</span>
+                    </div>
+                    <p class="text-xs text-orange-400 font-bold uppercase tracking-widest mb-8 bg-orange-400/10 w-max px-3 py-1 rounded-full">Tailored Strategy</p>
 
-                <ul class="space-y-6 mb-12 flex-grow">
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Tailored strategy based on your goals, product count, and growth targets
-                    </li>
-                    <li class="flex gap-3 text-sm text-slate-300">
-                        <svg class="w-5 h-5 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Built specifically for brands that want something entirely unique and scalable
-                    </li>
-                </ul>
-                <button onclick="sendWhatsApp('Custom')" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-colors">Let's Talk Strategy</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Notes & Clarifications -->
-    <section class="py-16 px-8 max-w-7xl mx-auto">
-        <div class="reveal">
-            <h3 class="text-lg font-bold text-slate-300 mb-8 tracking-tight">Notes & Clarifications</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-400 leading-relaxed">
-                <div class="space-y-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-[#FF6B35] font-bold text-lg mt-0.5">!</span>
-                        <p>Portfolio examples will be shared to show the exact quality and style you can expect.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-[#FF6B35] font-bold text-lg mt-0.5">!</span>
-                        <p>Final style, length, & complexity depend heavily on your specific product and goals.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-[#FF6B35] font-bold text-lg mt-0.5">!</span>
-                        <p>Ad spend is not included in the cost of any package provided above.</p>
-                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex gap-4 text-sm text-slate-300 font-medium">
+                            <svg class="w-6 h-6 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Tailored strategy based on your goals, product count, and growth targets
+                        </li>
+                        <li class="flex gap-4 text-sm text-slate-300 font-medium">
+                            <svg class="w-6 h-6 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Built specifically for brands that want something entirely unique and scalable
+                        </li>
+                    </ul>
                 </div>
-                <div class="space-y-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-[#FF6B35] font-bold text-lg mt-0.5">!</span>
-                        <p>Revisions are limited and will be clearly agreed upon before starting the project.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-[#FF6B35] font-bold text-lg mt-0.5">!</span>
-                        <p>Turnaround time naturally depends on the exact scope of your chosen project.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-[#FF6B35] font-bold text-lg mt-0.5">!</span>
-                        <p>Payment terms: 50% upfront payment is required to start. Remaining 50% due before final delivery.</p>
-                    </div>
+                <div class="md:w-1/3">
+                    <button onclick="sendWhatsApp('Custom')" class="w-full py-6 rounded-2xl bg-orange-500 text-dark font-extrabold text-lg shadow-[0_10px_20px_-10px_rgba(255,107,53,0.5)] hover:bg-orange-400 transition-colors">Let's Talk Strategy</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer with Instagram only -->
-    <footer class="py-12 border-t border-white/5 px-8">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-xl font-bold tracking-tighter text-slate-500">MARO STUDIO<span class="text-teal-400/50">.</span></div>
-            <p class="text-slate-500 text-sm">© 2026 Maro Studio. All rights reserved.</p>
-            <!-- Single Instagram link, other social removed -->
-            <a href="https://www.instagram.com/3dwith_maro" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors group">
-                <svg class="w-5 h-5 text-slate-400 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <section class="py-24 px-8 max-w-7xl mx-auto border-t border-white/[0.02]">
+        <div class="reveal glass-card p-10 md:p-14 rounded-[2rem]">
+            <h3 class="text-2xl font-black text-white mb-10 tracking-tight flex items-center gap-4">
+                <svg class="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Notes & Clarifications
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-sm text-slate-400 font-medium">
+                <div class="space-y-6">
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                        <span class="text-orange-500 font-black text-xl leading-none mt-0.5">!</span>
+                        <p class="leading-relaxed">Portfolio examples will be shared to show the exact quality and style you can expect.</p>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                        <span class="text-orange-500 font-black text-xl leading-none mt-0.5">!</span>
+                        <p class="leading-relaxed">Final style, length, & complexity depend heavily on your specific product and goals.</p>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                        <span class="text-orange-500 font-black text-xl leading-none mt-0.5">!</span>
+                        <p class="leading-relaxed">Ad spend is not included in the cost of any package provided above.</p>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                        <span class="text-orange-500 font-black text-xl leading-none mt-0.5">!</span>
+                        <p class="leading-relaxed">Revisions are limited and will be clearly agreed upon before starting the project.</p>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                        <span class="text-orange-500 font-black text-xl leading-none mt-0.5">!</span>
+                        <p class="leading-relaxed">Turnaround time naturally depends on the exact scope of your chosen project.</p>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                        <span class="text-orange-500 font-black text-xl leading-none mt-0.5">!</span>
+                        <p class="leading-relaxed">Payment terms: 50% upfront payment is required to start. Remaining 50% due before final delivery.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-16 border-t border-white/[0.05] px-8 bg-dark relative overflow-hidden">
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-32 bg-teal-500/10 blur-[100px] pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
+            <div class="text-2xl font-black tracking-tighter text-slate-300">MARO STUDIO<span class="text-teal-500">.</span></div>
+            <p class="text-slate-500 text-sm font-medium tracking-wide">© 2026 Maro Studio. All rights reserved.</p>
+            <a href="https://www.instagram.com/3dwith_maro" target="_blank" rel="noopener noreferrer" class="w-12 h-12 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-white/20 hover:scale-110 transition-all duration-300 group shadow-lg interactive">
+                <svg class="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.309.975.975 1.247 2.242 1.309 3.608.058 1.266.07 1.646.07 4.85 0 3.204-.012 3.584-.07 4.849-.062 1.366-.334 2.633-1.309 3.608-.975.975-2.242 1.247-3.608 1.309-1.266.058-1.646.07-4.85.07-3.204 0-3.584-.012-4.85-.07-1.366-.062-2.633-.334-3.608-1.309-.975-.975-1.247-2.242-1.309-3.608-.058-1.265-.07-1.645-.07-4.849 0-3.204.012-3.584.07-4.85.062-1.366.334-2.633 1.309-3.608.975-.975 2.242-1.247 3.608-1.309 1.265-.058 1.645-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.558.07-2.975.457-4.064 1.546-1.089 1.089-1.476 2.506-1.546 4.064-.058 1.28-.072 1.688-.072 4.947 0 3.259.014 3.667.072 4.947.07 1.558.457 2.975 1.546 4.064 1.089 1.089 2.506 1.476 4.064 1.546 1.28.058 1.688.072 4.947.072 3.259 0 3.667-.014 4.947-.072 1.558-.07 2.975-.457 4.064-1.546 1.089-1.089 1.476-2.506 1.546-4.064.058-1.28.072-1.688.072-4.947 0-3.259-.014-3.667-.072-4.947-.07-1.558-.457-2.975-1.546-4.064-1.089-1.089-2.506-1.476-4.064-1.546-1.28-.058-1.688-.072-4.947-.072z"></path>
                     <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998z"></path>
                     <circle cx="18.406" cy="5.594" r="1.44"></circle>
@@ -428,22 +511,40 @@
     </footer>
 
     <script>
-        // ========== CUSTOM CURSOR ==========
+        // ========== HARDWARE-ACCELERATED LERP CURSOR ==========
         const cursor = document.getElementById('cursor');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
+        
         document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+            mouseX = e.clientX;
+            mouseY = e.clientY;
         });
 
-        document.querySelectorAll('a, button, .placeholder-box, .commercial-item').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.style.transform = 'scale(4)');
-            el.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+        const animateCursor = () => {
+            const ease = 0.2; // Interpolation speed
+            cursorX += (mouseX - cursorX) * ease;
+            cursorY += (mouseY - cursorY) * ease;
+            // translate3d forces GPU rendering
+            cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+            requestAnimationFrame(animateCursor);
+        };
+        animateCursor();
+
+        // Hover states for cursor expanding
+        document.querySelectorAll('a, button, .interactive').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover-state'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover-state'));
         });
 
         // ========== REVEAL ANIMATIONS ==========
         const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+            entries.forEach(entry => { 
+                if (entry.isIntersecting) entry.target.classList.add('active'); 
+            });
         }, observerOptions);
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
@@ -451,7 +552,7 @@
         const carousel = document.getElementById('commercialCarousel');
         const track = document.getElementById('commercialTrack');
 
-        // Clone items to have more content (like original duplication but without animation)
+        // Clone items for a populated feel
         const originalItems = Array.from(track.children);
         originalItems.forEach(item => {
             const clone = item.cloneNode(true);
@@ -462,54 +563,38 @@
         let startX;
         let scrollLeft;
 
-        carousel.addEventListener('mousedown', (e) => {
+        const startDragging = (e) => {
             isDown = true;
             carousel.classList.add('active');
-            startX = e.pageX - carousel.offsetLeft;
+            cursor.classList.add('hover-state');
+            startX = (e.pageX || e.touches[0].pageX) - carousel.offsetLeft;
             scrollLeft = carousel.scrollLeft;
-            e.preventDefault();
-        });
+        };
 
-        carousel.addEventListener('mouseleave', () => {
+        const stopDragging = () => {
             isDown = false;
             carousel.classList.remove('active');
-        });
+            cursor.classList.remove('hover-state');
+        };
 
-        carousel.addEventListener('mouseup', () => {
-            isDown = false;
-            carousel.classList.remove('active');
-        });
-
-        carousel.addEventListener('mousemove', (e) => {
+        const moveDragging = (e) => {
             if (!isDown) return;
             e.preventDefault();
-            const x = e.pageX - carousel.offsetLeft;
-            const walk = (x - startX) * 1.5;
+            const x = (e.pageX || e.touches[0].pageX) - carousel.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll speed multiplier
             carousel.scrollLeft = scrollLeft - walk;
-        });
+        };
 
-        // Touch events for mobile
-        carousel.addEventListener('touchstart', (e) => {
-            isDown = true;
-            carousel.classList.add('active');
-            startX = e.touches[0].pageX - carousel.offsetLeft;
-            scrollLeft = carousel.scrollLeft;
-        });
+        carousel.addEventListener('mousedown', startDragging);
+        carousel.addEventListener('mouseleave', stopDragging);
+        carousel.addEventListener('mouseup', stopDragging);
+        carousel.addEventListener('mousemove', moveDragging);
 
-        carousel.addEventListener('touchend', () => {
-            isDown = false;
-            carousel.classList.remove('active');
-        });
+        carousel.addEventListener('touchstart', startDragging);
+        carousel.addEventListener('touchend', stopDragging);
+        carousel.addEventListener('touchmove', moveDragging);
 
-        carousel.addEventListener('touchmove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.touches[0].pageX - carousel.offsetLeft;
-            const walk = (x - startX) * 1.5;
-            carousel.scrollLeft = scrollLeft - walk;
-        });
-
-        // ========== LIGHTBOX LOGIC (cleaned, no slot numbers) ==========
+        // ========== LIGHTBOX LOGIC ==========
         const lightbox = document.getElementById('lightbox');
         const lightboxInner = document.getElementById('lightbox-inner');
         const closeBtn = document.getElementById('close-lightbox');
@@ -517,7 +602,7 @@
         window.openLightboxBySlot = function(slot) {
             lightboxInner.innerHTML = ''; 
             const container = document.createElement('div');
-            container.className = "w-full h-full flex items-center justify-center bg-black/40";
+            container.className = "w-full h-full flex items-center justify-center bg-transparent";
 
             const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             const videoExts = ['mp4', 'webm', 'mov'];
@@ -528,7 +613,7 @@
                 img.onload = () => {
                     const media = document.createElement('img');
                     media.src = img.src;
-                    media.className = "max-w-full max-h-full object-contain";
+                    media.className = "max-w-full max-h-full object-contain rounded-[1.5rem]";
                     container.appendChild(media);
                     lightboxInner.appendChild(container);
                 };
@@ -538,14 +623,13 @@
 
             const tryVideo = (extIndex) => {
                 if (extIndex >= videoExts.length) {
-                    // Generic placeholder without slot number
-                    container.innerHTML = `<div class="text-center p-12"><div class="w-24 h-24 mx-auto mb-6 text-teal-400/20"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div><h2 class="text-2xl font-bold mb-2">Preview unavailable</h2><p class="text-slate-400"></p></div>`;
+                    container.innerHTML = `<div class="text-center p-12"><div class="w-24 h-24 mx-auto mb-6 text-teal-500/20"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div><h2 class="text-3xl font-bold mb-2 text-white">Preview unavailable</h2></div>`;
                     lightboxInner.appendChild(container);
                     return;
                 }
                 const video = document.createElement('video');
                 video.oncanplay = () => {
-                    video.className = "max-w-full max-h-full object-contain";
+                    video.className = "max-w-full max-h-full object-contain rounded-[1.5rem]";
                     video.controls = true;
                     video.autoplay = true;
                     container.appendChild(video);
@@ -566,14 +650,14 @@
             lightbox.classList.remove('active');
             document.body.style.overflow = 'auto';
             cursor.style.display = 'block';
-            lightboxInner.innerHTML = '';
+            setTimeout(() => lightboxInner.innerHTML = '', 400); // Wait for transition
         };
 
         closeBtn.onclick = closeLightbox;
         lightbox.onclick = (e) => { if(e.target === lightbox) closeLightbox(); };
         document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLightbox(); });
 
-        // ========== LOAD ART MEDIA INTO ALL GALLERY ITEMS – NO SLOT NUMBERS ==========
+        // ========== LOAD ART MEDIA INTO GALLERY ==========
         (function loadArtMedia() {
             const workItems = document.querySelectorAll('#works .grid > div');
             const commercialItems = document.querySelectorAll('#commercials .commercial-item');
@@ -583,6 +667,7 @@
                 const slot = index + 1;
                 item.dataset.slot = slot;
                 item.onclick = (e) => {
+                    if (isDown) return; // Prevent clicking while dragging
                     e.stopPropagation();
                     openLightboxBySlot(slot);
                 };
@@ -594,14 +679,12 @@
                 const loadAndReplace = () => {
                     const mediaContainer = document.createElement('div');
                     mediaContainer.className = 'relative w-full h-full';
-                    // NO slot-number badge added
 
-                    const tryImageFirst = !isCommercial; // works: images first; commercials: videos first
+                    const tryImageFirst = !isCommercial; 
 
                     const tryImage = (extIndex) => {
                         if (extIndex >= imageExts.length) {
                             if (tryImageFirst) tryVideo(0);
-                            else showPlaceholder();
                             return;
                         }
                         const img = new Image();
@@ -610,6 +693,7 @@
                             mediaContainer.appendChild(img);
                             item.innerHTML = '';
                             item.appendChild(mediaContainer);
+                            item.classList.remove('shimmer-overlay');
                         };
                         img.onerror = () => tryImage(extIndex + 1);
                         img.src = `art/${slot}.${imageExts[extIndex]}`;
@@ -618,7 +702,6 @@
                     const tryVideo = (extIndex) => {
                         if (extIndex >= videoExts.length) {
                             if (!tryImageFirst) tryImage(0);
-                            else showPlaceholder();
                             return;
                         }
                         const video = document.createElement('video');
@@ -628,19 +711,13 @@
                             video.loop = true;
                             video.autoplay = true;
                             video.playsInline = true;
-                            video.load();
                             mediaContainer.appendChild(video);
                             item.innerHTML = '';
                             item.appendChild(mediaContainer);
+                            item.classList.remove('shimmer-overlay');
                         };
                         video.onerror = () => tryVideo(extIndex + 1);
                         video.src = `art/${slot}.${videoExts[extIndex]}`;
-                    };
-
-                    const showPlaceholder = () => {
-                        // keep original look, absolutely no number
-                        // item.innerHTML unchanged (already has placeholder styling)
-                        // just ensure no extra badges
                     };
 
                     if (tryImageFirst) tryImage(0);
@@ -653,7 +730,7 @@
 
         // ========== WHATSAPP MESSAGING FUNCTION ==========
         window.sendWhatsApp = function(planName) {
-            const phone = "201035342430"; // without '+'
+            const phone = "201035342430";
             const message = `Select ${planName}`;
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
