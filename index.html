@@ -1,770 +1,874 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth antialiased selection:bg-teal-500/30 selection:text-teal-100">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Maro Studio | Dominate Markets</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        dark: '#030508',
-                        card: '#0A0E17',
-                        teal: { 400: '#2DD4BF', 500: '#14B8A6' },
-                        orange: { 500: '#FF6B35' }
-                    },
-                    backgroundImage: {
-                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-                    },
-                    animation: {
-                        'shimmer': 'shimmer 3s infinite',
-                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        shimmer: {
-                            '0%': { transform: 'translateX(-150%) skewX(-15deg)' },
-                            '100%': { transform: 'translateX(150%) skewX(-15deg)' }
-                        },
-                        'pulse-glow': {
-                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(45, 212, 191, 0.4)' },
-                            '50%': { opacity: .7, boxShadow: '0 0 10px rgba(45, 212, 191, 0.1)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --accent-teal: #2DD4BF;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MARO Studio — 3D Product Animations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            background-color: #030508;
-            color: #F8FAFC;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
+    :root {
+      --black: #080808;
+      --white: #ffffff;
+      --grey: #888888;
+      --dim: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #ffffff;
+    }
 
-        /* Hide cursor on touch devices, enable on desktop */
-        @media (hover: hover) and (pointer: fine) {
-            body { cursor: none; }
-        }
-        @media (hover: none) and (pointer: coarse) {
-            #cursor { display: none !important; }
-        }
+    html { scroll-behavior: smooth; }
 
-        /* Hardware-accelerated Smooth Cursor (Desktop Only) */
-        #cursor {
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            margin-left: -8px;
-            margin-top: -8px;
-            pointer-events: none;
-            z-index: 9999;
-            mix-blend-mode: difference;
-            will-change: transform;
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
-        }
-        #cursor.hover-state {
-            width: 60px;
-            height: 60px;
-            margin-left: -30px;
-            margin-top: -30px;
-            background: rgba(255, 255, 255, 1);
-        }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
 
-        /* Studio Noise Overlay - optimized for mobile */
-        .noise-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 9998;
-            opacity: 0.02;
-            pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
+    /* ── Custom Cursor ── */
+    #cursor {
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+      will-change: transform;
+    }
+    #cursor.hovered { width: 40px; height: 40px; }
+    @media (hover: none) { #cursor { display: none; } body { cursor: auto; } }
 
-        /* Premium Mesh Background - Simplified for mobile rendering engines */
-        .mesh-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.06) 0%, transparent 50%), 
-                radial-gradient(circle at 85% 30%, rgba(79, 70, 229, 0.06) 0%, transparent 50%),
-                radial-gradient(circle at 50% 100%, rgba(255, 107, 53, 0.04) 0%, transparent 50%);
-            z-index: -1;
-        }
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 40px;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+      backdrop-filter: blur(0px);
+    }
 
-        /* Reveal Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .nav-logo {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      text-decoration: none;
+    }
 
-        /* Carousel Edge Fading & Native Mobile Scroll Styling */
-        .carousel-wrapper {
-            position: relative;
-        }
-        .carousel-wrapper::before,
-        .carousel-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0; bottom: 0;
-            width: 40px;
-            z-index: 10;
-            pointer-events: none;
-        }
-        @media (min-width: 768px) {
-            .carousel-wrapper::before, .carousel-wrapper::after { width: 100px; }
-        }
-        .carousel-wrapper::before {
-            left: 0;
-            background: linear-gradient(to right, #030508, transparent);
-        }
-        .carousel-wrapper::after {
-            right: 0;
-            background: linear-gradient(to left, #030508, transparent);
-        }
-        
-        .carousel-container {
-            overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE and Edge */
-            -webkit-overflow-scrolling: touch; /* Native momentum scrolling on iOS */
-            padding: 2rem 0;
-            /* Desktop drag cursor */
-            cursor: grab;
-        }
-        .carousel-container::-webkit-scrollbar { display: none; }
-        .carousel-container.active { cursor: grabbing; }
-        
-        .carousel-track {
-            display: flex;
-            gap: 1rem;
-            width: max-content;
-            padding: 0 1.5rem; /* Mobile padding */
-        }
-        @media (min-width: 768px) {
-            .carousel-track { gap: 2rem; padding: 0 4rem; }
-            .carousel-container { padding: 3rem 0; }
-        }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
 
-        /* Premium Item Cards */
-        .commercial-item, .placeholder-box {
-            background: var(--bg-card);
-            position: relative;
-            overflow: hidden;
-            border-radius: 1.25rem;
-            cursor: pointer;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-            /* Prevent video controls from catching touches on mobile */
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        @media (hover: hover) {
-            .commercial-item:hover, .placeholder-box:hover {
-                transform: translateY(-6px);
-                box-shadow: 0 20px 40px -10px rgba(45, 212, 191, 0.15), inset 0 1px 1px rgba(255,255,255,0.1);
-            }
-        }
-        
-        .commercial-item {
-            width: 260px;
-            height: 462px;
-            flex-shrink: 0;
-        }
-        @media (min-width: 768px) {
-            .commercial-item { width: 300px; height: 533px; border-radius: 1.5rem; }
-            .placeholder-box { border-radius: 1.5rem; }
-        }
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--white); }
 
-        /* Shimmer Overlay */
-        .shimmer-overlay::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -150%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
-            transform: skewX(-15deg);
-            animation: shimmer 3s infinite;
-            pointer-events: none;
-        }
+    .nav-cta {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--white);
+      border: none;
+      padding: 10px 22px;
+      border-radius: 100px;
+      cursor: none;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: scale(1.03); }
 
-        /* Glassmorphism Cards - Safely optimized for mobile */
-        .glass-card {
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    @media (max-width: 600px) {
+      nav { padding: 20px 20px; }
+      .nav-right { gap: 18px; }
+      .nav-cta { padding: 8px 16px; font-size: 12px; }
+    }
 
-        /* Text Gradients */
-        .text-gradient {
-            background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    /* ── HERO ── */
+    #hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
 
-        /* Fullscreen Lightbox Styles */
-        #lightbox {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(3, 5, 8, 0.98);
-            z-index: 10000;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            opacity: 0;
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #lightbox.active {
-            display: flex;
-            opacity: 1;
-        }
-        .lightbox-content {
-            width: 100%;
-            height: 100%;
-            max-width: 1400px;
-            position: relative;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: scale(0.95);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 1rem;
-        }
-        @media (min-width: 768px) {
-            .lightbox-content { width: 90%; height: 85%; padding: 0; border-radius: 2rem; background: #0A0E17; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8); }
-        }
-        #lightbox.active .lightbox-content {
-            transform: scale(1);
-        }
-        
-        .media-fit {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            pointer-events: none; /* Let the container handle clicks */
-        }
-        @media (hover: hover) {
-            .media-fit { transition: transform 0.5s ease; }
-            .commercial-item:hover .media-fit, .placeholder-box:hover .media-fit { transform: scale(1.03); }
-        }
-    </style>
+    .hero-line {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 14vw, 200px);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      display: block;
+    }
+
+    .hero-line-solid { color: var(--white); }
+
+    .hero-line-stroke {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--white);
+    }
+
+    .hero-sub {
+      margin-top: 36px;
+      font-size: clamp(13px, 2vw, 16px);
+      font-weight: 400;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.04em;
+    }
+
+    .hero-btn {
+      display: inline-block;
+      margin-top: 48px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 14px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.25s, border-color 0.25s, color 0.25s;
+    }
+    .hero-btn:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.35s; }
+    .reveal-delay-4 { transition-delay: 0.5s; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 60px;
+    }
+
+    /* ── BRAND STRIP ── */
+    #brands {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .brands-label {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 40px;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 80px;
+      width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+
+    .marquee-track:hover { animation-play-state: paused; }
+
+    .brand-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+    .brand-name:hover { color: rgba(255,255,255,0.65); }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── GALLERY ── */
+    #work {
+      padding: 120px 0 160px;
+      background: #0a0a0a;
+    }
+
+    #work .section-label { text-align: center; }
+
+    /* ── Scattered collage (desktop) ── */
+    .collage-stage {
+      position: relative;
+      width: 100%;
+      min-height: 1900px;
+    }
+
+    .collage-item {
+      position: absolute;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: none;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.38s ease,
+                  z-index 0s;
+      will-change: transform;
+    }
+
+    .collage-item:hover {
+      transform: translateY(-8px) rotate(0deg) !important;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.18);
+      z-index: 99 !important;
+    }
+
+    .collage-item img,
+    .collage-item video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ── Mobile grid fallback ── */
+    .mobile-grid {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 16px;
+    }
+
+    .mobile-grid-item {
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--dim);
+      transition: transform 0.3s ease;
+    }
+    .mobile-grid-item:hover { transform: scale(1.02); }
+
+    .mobile-grid-item img,
+    .mobile-grid-item video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      aspect-ratio: 1 / 1;
+    }
+
+    @media (max-width: 768px) {
+      .collage-stage { display: none; }
+      .mobile-grid { display: grid; }
+      #work { padding: 80px 0 100px; }
+    }
+
+    /* ── LIGHTBOX ── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #lightbox.open { display: flex; }
+
+    #lightbox-media {
+      max-width: 92vw;
+      max-height: 90svh;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+
+    #lightbox-close {
+      position: fixed;
+      top: 28px; right: 36px;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 32px;
+      cursor: none;
+      line-height: 1;
+      padding: 8px;
+      transition: color 0.2s;
+    }
+    #lightbox-close:hover { color: var(--white); }
+
+    /* ── PRICING ── */
+    #pricing {
+      padding: 120px 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    #pricing .section-label { text-align: center; margin-bottom: 80px; }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 860px) { .pricing-grid { grid-template-columns: 1fr; max-width: 480px; } }
+
+    .pricing-card {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      transition: border-color 0.3s, transform 0.3s;
+      background: var(--dim);
+    }
+
+    .pricing-card:hover { transform: translateY(-4px); }
+
+    .pricing-card.featured {
+      border-color: rgba(255,255,255,0.6);
+      background: #111111;
+    }
+
+    .plan-name {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .plan-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      line-height: 1;
+      color: var(--white);
+    }
+    .plan-price span { font-size: 32px; vertical-align: top; margin-top: 10px; display: inline-block; }
+
+    .plan-price-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      line-height: 1;
+      color: var(--white);
+    }
+
+    .plan-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .plan-bullets li {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .plan-bullets li::before {
+      content: '—';
+      color: rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+
+    .plan-btn {
+      display: block;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 14px 24px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .plan-btn:hover {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+    .pricing-card.featured .plan-btn {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+    .pricing-card.featured .plan-btn:hover {
+      opacity: 0.85;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    @media (max-width: 480px) { footer { flex-direction: column; text-align: center; } }
+
+    .footer-copy {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+    }
+
+    .footer-ig {
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .footer-ig:hover { color: var(--white); }
+    .footer-ig svg { width: 20px; height: 20px; }
+
+    /* ── SECTION SPACING ── */
+    section + section { margin-top: 0; }
+
+    /* ── EMPTY STATE ── */
+    .gallery-empty {
+      text-align: center;
+      padding: 80px 0;
+      color: rgba(255,255,255,0.2);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .gallery-hint {
+      text-align: center;
+      margin-bottom: 48px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.2);
+      line-height: 1.7;
+    }
+    .gallery-hint code {
+      font-family: monospace;
+      color: rgba(255,255,255,0.4);
+      background: #151515;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="cursor"></div>
-    <div class="noise-overlay"></div>
-    <div class="mesh-bg"></div>
+  <!-- CURSOR -->
+  <div id="cursor"></div>
 
-    <div id="lightbox" class="items-center justify-center p-0 md:p-8">
-        <button id="close-lightbox" class="fixed top-6 right-6 md:top-8 md:right-8 z-[10001] bg-white/10 hover:bg-white/20 w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center backdrop-blur-xl transition-all border border-white/10 group shadow-xl">
-            <svg class="w-5 h-5 md:w-6 md:h-6 text-white group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-        <div class="lightbox-content" id="lightbox-inner">
-            </div>
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">MARO</a>
+    <div class="nav-right">
+      <a href="#work" class="nav-link">Work</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="https://calendly.com/3dwithmaro/outstander" target="_blank" rel="noopener" class="nav-cta">Book a Call</a>
     </div>
+  </nav>
 
-    <nav class="fixed top-0 w-full z-50 bg-[#030508]/80 backdrop-blur-xl border-b border-white/[0.03] transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-6 md:px-8 h-20 md:h-24 flex items-center justify-between">
-            <div class="text-xl md:text-2xl font-black tracking-tighter text-white cursor-pointer interactive">MARO<span class="text-teal-400">.</span></div>
-            <div class="hidden md:flex gap-10 text-sm font-semibold text-slate-400 tracking-wide">
-                <a href="#works" class="hover:text-white transition-colors interactive">Works</a>
-                <a href="#commercials" class="hover:text-white transition-colors interactive">Commercials</a>
-                <a href="#pricing" class="hover:text-white transition-colors interactive">Pricing</a>
-            </div>
-            <a href="#pricing" class="px-5 py-2.5 md:px-7 md:py-3 rounded-full bg-white text-dark text-xs md:text-sm font-bold hover:bg-slate-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)] interactive">Get Started</a>
-        </div>
-    </nav>
+  <!-- HERO -->
+  <section id="hero">
+    <span class="hero-line hero-line-solid reveal">3D Product</span>
+    <span class="hero-line hero-line-stroke reveal reveal-delay-1">Animations.</span>
+    <p class="hero-sub reveal reveal-delay-2">That make your product impossible to ignore.</p>
+    <a href="#work" class="hero-btn reveal reveal-delay-3">See the Work</a>
+  </section>
 
-    <section class="pt-40 pb-20 md:pt-56 md:pb-32 px-6 md:px-8 max-w-7xl mx-auto min-h-[85vh] flex flex-col justify-center relative">
-        <div class="absolute top-20 left-0 w-64 h-64 bg-teal-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-        <div class="max-w-5xl">
-            <h1 class="text-6xl md:text-[8rem] lg:text-[10rem] font-black tracking-tighter leading-[0.9] md:leading-[0.85] reveal text-gradient drop-shadow-2xl">
-                DOMINATE<br>
-                <span class="text-slate-600/80 bg-clip-text text-transparent bg-gradient-to-b from-slate-400 to-slate-700">MARKETS</span>
-            </h1>
-            <p class="mt-8 md:mt-12 text-lg md:text-2xl text-slate-400 leading-relaxed reveal max-w-3xl font-medium" style="transition-delay: 150ms;">
-                With visuals that help small and big business to dominate their market with high engagement animations and visuals that instantly hook viewers and increase sales through attraction.
-            </p>
-        </div>
-    </section>
+  <!-- BRAND LOGOS STRIP -->
+  <section id="brands">
+    <p class="brands-label">Brands we've visualized</p>
+    <div style="overflow:hidden">
+      <div class="marquee-track" id="marqueeTrack">
+        <!-- duplicated for seamless loop — JS fills both halves -->
+      </div>
+    </div>
+  </section>
 
-    <section id="works" class="py-20 md:py-32 px-6 md:px-8 max-w-7xl mx-auto border-t border-white/[0.02]">
-        <div class="flex flex-col md:flex-row justify-between md:items-end mb-10 md:mb-16 reveal gap-4">
-            <h2 class="text-4xl md:text-5xl font-black tracking-tight text-white">Works_Archive</h2>
-            <div class="text-teal-400/80 text-xs md:text-sm font-mono tracking-widest uppercase bg-teal-500/10 px-4 py-2 rounded-full border border-teal-500/20 w-fit md:w-auto">[ 12 SELECTED PROJECTS ]</div>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-[250px] md:auto-rows-[320px]">
-            <div class="lg:col-span-2 lg:row-span-2 placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 200ms;"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
-            <div class="lg:col-span-2 placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 200ms;"></div>
-            <div class="placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive"></div>
-            <div class="lg:col-span-3 placeholder-box bg-glass-gradient shimmer-overlay reveal flex items-center justify-center group interactive" style="transition-delay: 100ms;"></div>
-        </div>
-    </section>
+  <!-- GALLERY -->
+  <section id="work">
 
-    <section id="commercials" class="py-20 md:py-32 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent pointer-events-none"></div>
-        
-        <div class="max-w-7xl mx-auto px-6 md:px-8 mb-10 md:mb-16 reveal relative z-10">
-            <h2 class="text-4xl md:text-6xl font-black tracking-tighter leading-tight">Animated<br><span class="text-teal-400">Commercials</span></h2>
-        </div>
+    <!-- Desktop: scattered collage -->
+    <div class="collage-stage" id="collageStage"></div>
+    <!-- Mobile: 2-col grid -->
+    <div class="mobile-grid" id="mobileGrid"></div>
+    <div class="gallery-empty" id="galleryEmpty" style="display:none">
+      No media found in <code>art/</code> — add files and reload.
+    </div>
+  </section>
 
-        <div class="carousel-wrapper relative z-10">
-            <div class="carousel-container" id="commercialCarousel">
-                <div class="carousel-track" id="commercialTrack">
-                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
-                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
-                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
-                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
-                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
-                    <div class="commercial-item group bg-glass-gradient shimmer-overlay interactive"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- LIGHTBOX -->
+  <div id="lightbox" role="dialog" aria-modal="true">
+    <button id="lightbox-close" aria-label="Close">&times;</button>
+    <!-- media injected by JS -->
+  </div>
 
-    <section id="pricing" class="py-24 md:py-40 px-6 md:px-8 max-w-7xl mx-auto border-t border-white/[0.02] relative">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-full bg-teal-500/5 blur-[100px] -z-10 rounded-full pointer-events-none"></div>
-        
-        <div class="text-center mb-16 md:mb-24 reveal">
-            <h2 class="text-4xl md:text-6xl font-black mb-4 md:mb-6 tracking-tight">Pricing to meet different needs.</h2>
-            <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-medium">Choose a plan that scales your brand today.</p>
-        </div>
+  <!-- PRICING -->
+  <section id="pricing">
+    <p class="section-label">Pricing</p>
+    <div class="pricing-grid">
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-center">
-            <div class="glass-card p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col reveal interactive transition-transform hover:-translate-y-2">
-                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Foundation</h3>
-                <div class="flex items-baseline gap-3 mb-3">
-                    <span class="text-4xl md:text-5xl font-black text-white">$999</span>
-                    <span class="text-slate-500 line-through font-semibold text-base md:text-lg">$1,999</span>
-                </div>
-                <p class="text-[10px] md:text-xs text-teal-400 font-bold uppercase tracking-widest mb-8 md:mb-10 bg-teal-400/10 w-max px-3 py-1 rounded-full">50% Discount Applied</p>
+      <!-- Starter -->
+      <div class="pricing-card reveal">
+        <p class="plan-name">Starter</p>
+        <p class="plan-price"><span>$</span>999</p>
+        <ul class="plan-bullets">
+          <li>1 product, 15–20 sec animation</li>
+          <li>2 revision rounds</li>
+          <li>Delivered in 5 days</li>
+        </ul>
+        <a href="https://calendly.com/3dwithmaro/outstander" target="_blank" rel="noopener" class="plan-btn">Book This</a>
+      </div>
 
-                <ul class="space-y-5 md:space-y-6 mb-10 md:mb-12 flex-grow">
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        1 animated product video (showing all product features)
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        1 hero shot for landing pages and social media
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        1 master shot covering different/all variations of your product
-                    </li>
-                </ul>
-                <button onclick="sendWhatsApp('Foundation')" class="w-full py-4 md:py-5 rounded-2xl bg-white/[0.03] border border-white/10 font-bold text-white hover:bg-white/10 transition-colors">Select Plan</button>
-            </div>
+      <!-- Brand (featured) -->
+      <div class="pricing-card featured reveal reveal-delay-1">
+        <p class="plan-name">Brand</p>
+        <p class="plan-price"><span>$</span>2,999</p>
+        <ul class="plan-bullets">
+          <li>1 product, 30–60 sec cinematic animation</li>
+          <li>Full lighting, motion &amp; sound design</li>
+          <li>3 revisions, delivered in 8–10 days</li>
+        </ul>
+        <a href="https://calendly.com/3dwithmaro/outstander" target="_blank" rel="noopener" class="plan-btn">Book This</a>
+      </div>
 
-            <div class="bg-card border border-teal-500/30 p-8 md:p-12 rounded-[2rem] md:rounded-[2.5rem] flex flex-col relative reveal lg:-translate-y-6 shadow-[0_0_40px_rgba(45,212,191,0.05)] interactive z-10 transition-transform lg:hover:-translate-y-8">
-                <div class="absolute inset-0 rounded-[2rem] md:rounded-[2.5rem] border-2 border-transparent bg-clip-border [background-image:linear-gradient(to_bottom,rgba(45,212,191,0.5),rgba(45,212,191,0.1))] pointer-events-none -z-10"></div>
-                <div class="absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 bg-teal-500 text-dark px-5 md:px-6 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-lg animate-pulse-glow w-max">Most Recommended</div>
-                
-                <h3 class="text-2xl md:text-3xl font-black mb-3 text-white">Outstander</h3>
-                <div class="flex items-baseline gap-3 mb-3">
-                    <span class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500">$2,499</span>
-                    <span class="text-slate-500 line-through font-semibold text-lg md:text-xl">$4,999</span>
-                </div>
-                <p class="text-[10px] md:text-xs text-teal-400 font-bold uppercase tracking-widest mb-8 md:mb-10 bg-teal-400/10 w-max px-3 py-1 rounded-full">50% Discount Applied</p>
+      <!-- Custom -->
+      <div class="pricing-card reveal reveal-delay-2">
+        <p class="plan-name">Custom</p>
+        <p class="plan-price-text">Let's Talk</p>
+        <ul class="plan-bullets">
+          <li>Campaigns &amp; multiple products</li>
+          <li>Ongoing brand retainers</li>
+          <li>Price based on scope</li>
+        </ul>
+        <a href="https://calendly.com/3dwithmaro/outstander" target="_blank" rel="noopener" class="plan-btn">Let's Talk</a>
+      </div>
 
-                <ul class="space-y-5 md:space-y-6 mb-10 md:mb-12 flex-grow">
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-200 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        3 high-quality videos (with clear storyboards and reference)
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-200 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        2 premium hero shots (ads + landing page)
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-200 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Studio/white background shots for online store
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-200 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Private WhatsApp group with daily updates
-                    </li>
-                </ul>
-                <button onclick="sendWhatsApp('Outstander')" class="w-full py-4 md:py-5 rounded-2xl bg-teal-500 text-dark font-extrabold text-base md:text-lg shadow-[0_10px_20px_-10px_rgba(45,212,191,0.5)] hover:bg-teal-400 transition-colors">Get Started Today</button>
-            </div>
+    </div>
+  </section>
 
-            <div class="glass-card p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col reveal interactive transition-transform hover:-translate-y-2 lg:delay-100">
-                <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">Market Dominator</h3>
-                <div class="flex items-baseline gap-3 mb-3">
-                    <span class="text-4xl md:text-5xl font-black text-white">$4,999</span>
-                    <span class="text-slate-500 line-through font-semibold text-base md:text-lg">$9,999</span>
-                </div>
-                <p class="text-[10px] md:text-xs text-teal-400 font-bold uppercase tracking-widest mb-8 md:mb-10 bg-teal-400/10 w-max px-3 py-1 rounded-full">50% Discount Applied</p>
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-copy">MARO Studio &copy; 2026</p>
+    <a href="https://www.instagram.com/3dwith_maro" target="_blank" rel="noopener" class="footer-ig" aria-label="Instagram">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="5"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+  </footer>
 
-                <ul class="space-y-5 md:space-y-6 mb-10 md:mb-12 flex-grow">
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        6 high-impact videos (Advanced motion graphics)
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        3 premium hero shots
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Monthly performance reviews (charts + strategy)
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Consistent weekly + monthly social uploads
-                    </li>
-                    <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium leading-relaxed">
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Private WhatsApp group for tracking
-                    </li>
-                </ul>
-                <button onclick="sendWhatsApp('Market Dominator')" class="w-full py-4 md:py-5 rounded-2xl bg-white/[0.03] border border-white/10 font-bold text-white hover:bg-white/10 transition-colors">Select Plan</button>
-            </div>
+  <script>
+    /* ── Cursor ── */
+    (function () {
+      const cursor = document.getElementById('cursor');
+      let mx = 0, my = 0, cx = 0, cy = 0;
 
-            <div class="glass-card p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-8 md:gap-10 reveal lg:col-span-3 lg:mt-4 border-orange-500/20 shadow-[0_0_30px_rgba(255,107,53,0.05)] interactive transition-transform hover:-translate-y-1">
-                <div class="flex-1">
-                    <h3 class="text-2xl md:text-3xl font-black mb-2 md:mb-3 text-orange-500 tracking-tight">Enterprise</h3>
-                    <div class="flex items-baseline gap-2 mb-3 md:mb-4">
-                        <span class="text-3xl md:text-4xl font-extrabold text-white">Custom Plan</span>
-                    </div>
-                    <p class="text-[10px] md:text-xs text-orange-400 font-bold uppercase tracking-widest mb-6 md:mb-8 bg-orange-400/10 w-max px-3 py-1 rounded-full">Tailored Strategy</p>
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-                    <ul class="space-y-4">
-                        <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium">
-                            <svg class="w-5 h-5 md:w-6 md:h-6 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Tailored strategy based on your goals, product count, and growth targets
-                        </li>
-                        <li class="flex gap-3 md:gap-4 text-sm text-slate-300 font-medium">
-                            <svg class="w-5 h-5 md:w-6 md:h-6 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Built specifically for brands that want something entirely unique and scalable
-                        </li>
-                    </ul>
-                </div>
-                <div class="md:w-1/3 w-full">
-                    <button onclick="sendWhatsApp('Custom')" class="w-full py-4 md:py-6 rounded-2xl bg-orange-500 text-dark font-extrabold text-base md:text-lg shadow-[0_10px_20px_-10px_rgba(255,107,53,0.5)] hover:bg-orange-400 transition-colors">Let's Talk Strategy</button>
-                </div>
-            </div>
-        </div>
-    </section>
+      function tick() {
+        cx += (mx - cx) * 0.15;
+        cy += (my - cy) * 0.15;
+        cursor.style.left = cx + 'px';
+        cursor.style.top = cy + 'px';
+        requestAnimationFrame(tick);
+      }
+      tick();
 
-    <section class="py-16 md:py-24 px-6 md:px-8 max-w-7xl mx-auto border-t border-white/[0.02]">
-        <div class="reveal glass-card p-8 md:p-14 rounded-[2rem]">
-            <h3 class="text-xl md:text-2xl font-black text-white mb-8 md:mb-10 tracking-tight flex items-center gap-3 md:gap-4">
-                <svg class="w-5 h-5 md:w-6 md:h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Notes & Clarifications
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 md:gap-y-6 text-sm text-slate-400 font-medium">
-                <div class="space-y-4 md:space-y-6">
-                    <div class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                        <span class="text-orange-500 font-black text-lg md:text-xl leading-none mt-0.5">!</span>
-                        <p class="leading-relaxed">Portfolio examples will be shared to show the exact quality and style you can expect.</p>
-                    </div>
-                    <div class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                        <span class="text-orange-500 font-black text-lg md:text-xl leading-none mt-0.5">!</span>
-                        <p class="leading-relaxed">Final style, length, & complexity depend heavily on your specific product and goals.</p>
-                    </div>
-                    <div class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                        <span class="text-orange-500 font-black text-lg md:text-xl leading-none mt-0.5">!</span>
-                        <p class="leading-relaxed">Ad spend is not included in the cost of any package provided above.</p>
-                    </div>
-                </div>
-                <div class="space-y-4 md:space-y-6">
-                    <div class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                        <span class="text-orange-500 font-black text-lg md:text-xl leading-none mt-0.5">!</span>
-                        <p class="leading-relaxed">Revisions are limited and will be clearly agreed upon before starting the project.</p>
-                    </div>
-                    <div class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                        <span class="text-orange-500 font-black text-lg md:text-xl leading-none mt-0.5">!</span>
-                        <p class="leading-relaxed">Turnaround time naturally depends on the exact scope of your chosen project.</p>
-                    </div>
-                    <div class="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                        <span class="text-orange-500 font-black text-lg md:text-xl leading-none mt-0.5">!</span>
-                        <p class="leading-relaxed">Payment terms: 50% upfront payment is required to start. Remaining 50% due before final delivery.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+      document.querySelectorAll('a, button, .masonry-item, .nav-cta').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+      });
+    })();
 
-    <footer class="py-12 md:py-16 border-t border-white/[0.05] px-6 md:px-8 bg-dark relative overflow-hidden">
-        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] md:w-1/2 h-32 bg-teal-500/10 blur-[80px] md:blur-[100px] pointer-events-none"></div>
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8 relative z-10 text-center md:text-left">
-            <div class="text-xl md:text-2xl font-black tracking-tighter text-slate-300">MARO STUDIO<span class="text-teal-500">.</span></div>
-            <p class="text-slate-500 text-xs md:text-sm font-medium tracking-wide">© 2026 Maro Studio. All rights reserved.</p>
-            <a href="https://www.instagram.com/3dwith_maro" target="_blank" rel="noopener noreferrer" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-white/20 hover:scale-110 transition-all duration-300 group shadow-lg interactive">
-                <svg class="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.309.975.975 1.247 2.242 1.309 3.608.058 1.266.07 1.646.07 4.85 0 3.204-.012 3.584-.07 4.849-.062 1.366-.334 2.633-1.309 3.608-.975.975-2.242 1.247-3.608 1.309-1.266.058-1.646.07-4.85.07-3.204 0-3.584-.012-4.85-.07-1.366-.062-2.633-.334-3.608-1.309-.975-.975-1.247-2.242-1.309-3.608-.058-1.265-.07-1.645-.07-4.849 0-3.204.012-3.584.07-4.85.062-1.366.334-2.633 1.309-3.608.975-.975 2.242-1.247 3.608-1.309 1.265-.058 1.645-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.558.07-2.975.457-4.064 1.546-1.089 1.089-1.476 2.506-1.546 4.064-.058 1.28-.072 1.688-.072 4.947 0 3.259.014 3.667.072 4.947.07 1.558.457 2.975 1.546 4.064 1.089 1.089 2.506 1.476 4.064 1.546 1.28.058 1.688.072 4.947.072 3.259 0 3.667-.014 4.947-.072 1.558-.07 2.975-.457 4.064-1.546 1.089-1.089 1.476-2.506 1.546-4.064.058-1.28.072-1.688.072-4.947 0-3.259-.014-3.667-.072-4.947-.07-1.558-.457-2.975-1.546-4.064-1.089-1.089-2.506-1.476-4.064-1.546-1.28-.058-1.688-.072-4.947-.072z"></path>
-                    <path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998z"></path>
-                    <circle cx="18.406" cy="5.594" r="1.44"></circle>
-                </svg>
-            </a>
-        </div>
-    </footer>
+    /* ── Brands Marquee ── */
+    (function () {
+      const brands = ['CHANEL', 'NIKE', 'ROLEX', "KELLOGG'S", 'NIVEA', 'OLAPLEX', 'CROCS'];
+      const track = document.getElementById('marqueeTrack');
+      const full = [...brands, ...brands]; // duplicate for seamless loop
 
-    <script>
-        // ========== HARDWARE-ACCELERATED LERP CURSOR (DESKTOP ONLY) ==========
-        // Only run cursor logic if on a device with a fine pointer (mouse)
-        if (window.matchMedia("(pointer: fine)").matches) {
-            const cursor = document.getElementById('cursor');
-            let mouseX = window.innerWidth / 2;
-            let mouseY = window.innerHeight / 2;
-            let cursorX = mouseX;
-            let cursorY = mouseY;
-            
-            document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
+      full.forEach(name => {
+        const span = document.createElement('span');
+        span.className = 'brand-name';
+        span.textContent = name;
+        track.appendChild(span);
+      });
+    })();
 
-            const animateCursor = () => {
-                const ease = 0.2; 
-                cursorX += (mouseX - cursorX) * ease;
-                cursorY += (mouseY - cursorY) * ease;
-                cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
-                requestAnimationFrame(animateCursor);
-            };
-            animateCursor();
+    /* ── Gallery auto-detect + Scattered Collage ── */
+    (function () {
+      const stage = document.getElementById('collageStage');
+      const mobileGrid = document.getElementById('mobileGrid');
+      const emptyMsg = document.getElementById('galleryEmpty');
+      const imgExts = ['jpg', 'jpeg', 'png', 'webp'];
+      const vidExts = ['mp4', 'webm'];
+      let loaded = 0;
+      let resolved = 0;
+      const total = 40;
 
-            document.querySelectorAll('a, button, .interactive').forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('hover-state'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('hover-state'));
-            });
+      // Seeded pseudo-random for reproducible layout
+      function seededRand(seed) {
+        let s = seed;
+        return function () {
+          s = (s * 16807 + 0) % 2147483647;
+          return (s - 1) / 2147483646;
+        };
+      }
+
+      // Collage layout blueprint — [leftPct, topPx, widthPx, heightPx, rotDeg, zIndex]
+      // Row spacing ~290px, cards overlap between rows. Varied sizes, full-width spread.
+      const ZONES = [
+        // Row 1  (~top 20-60px)
+        [1,  30,  300, 260, -2.5, 2],
+        [17, 10,  370, 290,  2.0, 3],
+        [37, 20,  290, 380, -3.2, 4],
+        [57, 15,  360, 260,  1.8, 2],
+        [77, 45,  280, 310, -1.6, 1],
+        // Row 2  (~top 360-400px)
+        [4,  370, 280, 310,  3.5, 3],
+        [23, 340, 420, 270, -2.2, 2],
+        [50, 355, 300, 360,  1.4, 5],
+        [72, 365, 310, 280, -3.8, 2],
+        // Row 3  (~top 740-780px)
+        [1,  740, 350, 270,  2.8, 2],
+        [21, 725, 280, 340, -1.9, 3],
+        [42, 750, 390, 250,  3.4, 1],
+        [65, 730, 300, 310, -2.6, 2],
+        [83, 760, 250, 290,  1.3, 3],
+        // Row 4  (~top 1120-1160px)
+        [5,  1135, 320, 280, -2.1, 2],
+        [26, 1110, 280, 360,  3.8, 3],
+        [47, 1130, 360, 270, -1.5, 1],
+        [70, 1145, 290, 310,  2.9, 2],
+        // Row 5  (~top 1500-1540px)
+        [3,  1515, 310, 270,  1.9, 1],
+        [27, 1495, 350, 290, -3.3, 2],
+      ];
+
+      const items = []; // { src, isVideo }
+
+      function onDone() {
+        resolved++;
+        if (resolved === total) {
+          if (loaded === 0) {
+            emptyMsg.style.display = '';
+          } else {
+            layoutCollage();
+          }
+        }
+      }
+
+      function tryLoad(slot) {
+        const all = [
+          ...imgExts.map(ext => `art/${slot}.${ext}`),
+          ...vidExts.map(ext => `art/${slot}.${ext}`)
+        ];
+        let idx = 0;
+
+        function next() {
+          if (idx >= all.length) { onDone(); return; }
+          const src = all[idx++];
+          const isVideo = vidExts.some(e => src.endsWith('.' + e));
+
+          if (isVideo) {
+            const vid = document.createElement('video');
+            vid.src = src;
+            vid.muted = true;
+            vid.autoplay = true;
+            vid.loop = true;
+            vid.playsInline = true;
+            vid.preload = 'metadata';
+            vid.onloadedmetadata = () => { loaded++; items.push({ src, isVideo: true, el: vid }); onDone(); };
+            vid.onerror = next;
+          } else {
+            const img = new Image();
+            img.onload = () => { loaded++; items.push({ src, isVideo: false, el: img }); onDone(); };
+            img.onerror = next;
+            img.src = src;
+          }
+        }
+        next();
+      }
+
+      function shuffle(arr) {
+        // Fisher-Yates shuffle — mixes photos and videos evenly
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function layoutCollage() {
+        shuffle(items); // mix photos + videos throughout
+
+        items.forEach((item, i) => {
+          const zone = ZONES[i % ZONES.length];
+          const [lPct, topPx, w, h, rot, zi] = zone;
+
+          // Desktop collage card
+          const card = document.createElement('div');
+          card.className = 'collage-item';
+          card.style.cssText = `
+            left: ${lPct}%;
+            top: ${topPx}px;
+            width: ${w}px;
+            height: ${h}px;
+            transform: rotate(${rot}deg);
+            z-index: ${zi};
+          `;
+          const mediaEl = item.el.cloneNode(true);
+          if (item.isVideo) {
+            mediaEl.muted = true;
+            mediaEl.autoplay = true;
+            mediaEl.loop = true;
+            mediaEl.playsInline = true;
+          }
+          card.appendChild(mediaEl);
+          card.addEventListener('click', () => openLightbox(item.src, item.isVideo));
+          stage.appendChild(card);
+
+          // Mobile grid card
+          const mCard = document.createElement('div');
+          mCard.className = 'mobile-grid-item';
+          const mMedia = item.el.cloneNode(true);
+          if (item.isVideo) {
+            mMedia.muted = true;
+            mMedia.autoplay = true;
+            mMedia.loop = true;
+            mMedia.playsInline = true;
+          }
+          mCard.appendChild(mMedia);
+          mCard.addEventListener('click', () => openLightbox(item.src, item.isVideo));
+          mobileGrid.appendChild(mCard);
+        });
+
+        // Set stage height to fit all cards (topPx + height + padding)
+        let maxBottom = 0;
+        items.forEach((_, i) => {
+          const zone = ZONES[i % ZONES.length];
+          const bottom = zone[1] + zone[3];
+          if (bottom > maxBottom) maxBottom = bottom;
+        });
+        stage.style.minHeight = (maxBottom + 80) + 'px';
+
+        // Cursor hover for collage items
+        document.querySelectorAll('.collage-item').forEach(el => {
+          el.addEventListener('mouseenter', () => document.getElementById('cursor').classList.add('hovered'));
+          el.addEventListener('mouseleave', () => document.getElementById('cursor').classList.remove('hovered'));
+        });
+      }
+
+      for (let i = 1; i <= total; i++) tryLoad(i);
+    })();
+
+    /* ── Lightbox ── */
+    (function () {
+      const lb = document.getElementById('lightbox');
+      const closeBtn = document.getElementById('lightbox-close');
+      let currentMedia = null;
+
+      window.openLightbox = function (src, isVideo) {
+        if (currentMedia) currentMedia.remove();
+
+        if (isVideo) {
+          const vid = document.createElement('video');
+          vid.src = src;
+          vid.controls = true;
+          vid.autoplay = true;
+          vid.id = 'lightbox-media';
+          lb.appendChild(vid);
+          currentMedia = vid;
+        } else {
+          const img = document.createElement('img');
+          img.src = src;
+          img.id = 'lightbox-media';
+          lb.appendChild(img);
+          currentMedia = img;
         }
 
-        // ========== REVEAL ANIMATIONS ==========
-        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { 
-                if (entry.isIntersecting) entry.target.classList.add('active'); 
-            });
-        }, observerOptions);
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        lb.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      };
 
-        // ========== DRAGGABLE CAROUSEL (commercials) ==========
-        const carousel = document.getElementById('commercialCarousel');
-        const track = document.getElementById('commercialTrack');
+      function close() {
+        lb.classList.remove('open');
+        document.body.style.overflow = '';
+        if (currentMedia) { currentMedia.remove(); currentMedia = null; }
+      }
 
-        // Clone items for a populated feel
-        const originalItems = Array.from(track.children);
-        originalItems.forEach(item => {
-            const clone = item.cloneNode(true);
-            track.appendChild(clone);
-        });
+      closeBtn.addEventListener('click', close);
+      lb.addEventListener('click', e => { if (e.target === lb) close(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    })();
 
-        // DESKTOP DRAGGING ONLY - Mobile uses smooth native horizontal scroll (CSS overflow-x)
-        let isDown = false;
-        let startX;
-        let scrollLeft;
+    /* ── Scroll Reveal ── */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
 
-        carousel.addEventListener('mousedown', (e) => {
-            isDown = true;
-            carousel.classList.add('active');
-            if(window.matchMedia("(pointer: fine)").matches) {
-                document.getElementById('cursor').classList.add('hover-state');
-            }
-            startX = e.pageX - carousel.offsetLeft;
-            scrollLeft = carousel.scrollLeft;
-        });
-
-        carousel.addEventListener('mouseleave', () => {
-            isDown = false;
-            carousel.classList.remove('active');
-            if(window.matchMedia("(pointer: fine)").matches) {
-                document.getElementById('cursor').classList.remove('hover-state');
-            }
-        });
-
-        carousel.addEventListener('mouseup', () => {
-            isDown = false;
-            carousel.classList.remove('active');
-            if(window.matchMedia("(pointer: fine)").matches) {
-                document.getElementById('cursor').classList.remove('hover-state');
-            }
-        });
-
-        carousel.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault(); // Only prevent default on mouse dragging
-            const x = e.pageX - carousel.offsetLeft;
-            const walk = (x - startX) * 2; 
-            carousel.scrollLeft = scrollLeft - walk;
-        });
-
-
-        // ========== LIGHTBOX LOGIC ==========
-        const lightbox = document.getElementById('lightbox');
-        const lightboxInner = document.getElementById('lightbox-inner');
-        const closeBtn = document.getElementById('close-lightbox');
-
-        window.openLightboxBySlot = function(slot) {
-            lightboxInner.innerHTML = ''; 
-            const container = document.createElement('div');
-            container.className = "w-full h-full flex items-center justify-center bg-transparent";
-
-            const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            const videoExts = ['mp4', 'webm', 'mov'];
-
-            const tryImage = (extIndex) => {
-                if (extIndex >= imageExts.length) { tryVideo(0); return; }
-                const img = new Image();
-                img.onload = () => {
-                    const media = document.createElement('img');
-                    media.src = img.src;
-                    media.className = "max-w-full max-h-full object-contain md:rounded-[1.5rem]";
-                    container.appendChild(media);
-                    lightboxInner.appendChild(container);
-                };
-                img.onerror = () => tryImage(extIndex + 1);
-                img.src = `art/${slot}.${imageExts[extIndex]}`;
-            };
-
-            const tryVideo = (extIndex) => {
-                if (extIndex >= videoExts.length) {
-                    container.innerHTML = `<div class="text-center p-8 md:p-12"><div class="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 text-teal-500/20"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div><h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Preview unavailable</h2></div>`;
-                    lightboxInner.appendChild(container);
-                    return;
-                }
-                const video = document.createElement('video');
-                video.oncanplay = () => {
-                    video.className = "max-w-full max-h-full object-contain md:rounded-[1.5rem]";
-                    video.controls = true;
-                    video.autoplay = true;
-                    video.playsInline = true; // Important for mobile
-                    container.appendChild(video);
-                    lightboxInner.appendChild(container);
-                };
-                video.onerror = () => tryVideo(extIndex + 1);
-                video.src = `art/${slot}.${videoExts[extIndex]}`;
-            };
-
-            tryImage(0);
-
-            lightbox.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            if(window.matchMedia("(pointer: fine)").matches) {
-                document.getElementById('cursor').style.display = 'none';
-            }
-        };
-
-        const closeLightbox = () => {
-            lightbox.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            if(window.matchMedia("(pointer: fine)").matches) {
-                document.getElementById('cursor').style.display = 'block';
-            }
-            setTimeout(() => lightboxInner.innerHTML = '', 400); 
-        };
-
-        closeBtn.onclick = closeLightbox;
-        lightbox.onclick = (e) => { if(e.target === lightbox) closeLightbox(); };
-        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLightbox(); });
-
-        // ========== LOAD ART MEDIA INTO GALLERY ==========
-        (function loadArtMedia() {
-            const workItems = document.querySelectorAll('#works .grid > div');
-            const commercialItems = document.querySelectorAll('#commercials .commercial-item');
-            const allItems = [...workItems, ...commercialItems];
-
-            allItems.forEach((item, index) => {
-                const slot = index + 1;
-                item.dataset.slot = slot;
-                item.onclick = (e) => {
-                    if (isDown) return; 
-                    e.stopPropagation();
-                    openLightboxBySlot(slot);
-                };
-
-                const isCommercial = [...commercialItems].includes(item);
-                const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                const videoExts = ['mp4', 'webm', 'mov'];
-
-                const loadAndReplace = () => {
-                    const mediaContainer = document.createElement('div');
-                    mediaContainer.className = 'relative w-full h-full';
-
-                    const tryImageFirst = !isCommercial; 
-
-                    const tryImage = (extIndex) => {
-                        if (extIndex >= imageExts.length) {
-                            if (tryImageFirst) tryVideo(0);
-                            return;
-                        }
-                        const img = new Image();
-                        img.onload = () => {
-                            img.className = 'media-fit';
-                            mediaContainer.appendChild(img);
-                            item.innerHTML = '';
-                            item.appendChild(mediaContainer);
-                            item.classList.remove('shimmer-overlay');
-                        };
-                        img.onerror = () => tryImage(extIndex + 1);
-                        img.src = `art/${slot}.${imageExts[extIndex]}`;
-                    };
-
-                    const tryVideo = (extIndex) => {
-                        if (extIndex >= videoExts.length) {
-                            if (!tryImageFirst) tryImage(0);
-                            return;
-                        }
-                        const video = document.createElement('video');
-                        video.oncanplay = () => {
-                            video.className = 'media-fit pointer-events-none'; // crucial so mobile touch doesn't get trapped by video
-                            video.muted = true;
-                            video.loop = true;
-                            video.autoplay = true;
-                            video.playsInline = true;
-                            mediaContainer.appendChild(video);
-                            item.innerHTML = '';
-                            item.appendChild(mediaContainer);
-                            item.classList.remove('shimmer-overlay');
-                        };
-                        video.onerror = () => tryVideo(extIndex + 1);
-                        video.src = `art/${slot}.${videoExts[extIndex]}`;
-                    };
-
-                    if (tryImageFirst) tryImage(0);
-                    else tryVideo(0);
-                };
-
-                loadAndReplace();
-            });
-        })();
-
-        // ========== CALENDLY BOOKING FUNCTION ==========
-        window.sendWhatsApp = function(planName) {
-            const calendlyUrl = "https://calendly.com/3dwithmaro/outstander";
-            window.open(calendlyUrl, '_blank');
-        };
-    </script>
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
 </body>
 </html>
